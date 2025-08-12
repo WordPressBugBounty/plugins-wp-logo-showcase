@@ -153,7 +153,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='text'
                     class='{$this->class}'
                     id='{$this->id}'
-                    value='{$this->value}'
+                    value='".esc_attr( $this->value )."'
                     name='{$this->name}'
                     placeholder='{$this->placeholder}'
                     {$this->attr}
@@ -173,7 +173,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='text'
                     class='{$this->class} rt-color'
                     id='{$this->id}'
-                    value='{$this->value}'
+                    value='".esc_attr( $this->value )."'
                     name='{$this->name}'
                     placeholder='{$this->placeholder}'
                     {$this->attr}
@@ -201,7 +201,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                         class='custom_css_textarea'
                         id='{$this->id}'
                         name='{$this->name}'
-                        >{$this->value}</textarea>";
+                        >".esc_textarea( $this->value )."</textarea>";
 			$h .= '</div>';
 
 			return $h;
@@ -218,7 +218,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='url'
                     class='{$this->class}'
                     id='{$this->id}'
-                    value='{$this->value}'
+                    value='".esc_attr( $this->value )."'
                     name='{$this->name}'
                     placeholder='{$this->placeholder}'
                     {$this->attr}
@@ -238,8 +238,8 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='number'
                     class='{$this->class}'
                     id='{$this->id}'
-                    value='{$this->value}'
-                    name='{$this->name}'
+                    value='" . esc_attr( $this->value ) . "'
+                    name='" . esc_attr( $this->name ) . "'
                     placeholder='{$this->placeholder}'
                     {$this->attr}
                     />";
@@ -270,7 +270,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			if ( is_array( $this->options ) && ! empty( $this->options ) ) {
 				foreach ( $this->options as $key => $value ) {
 					$slt = ( in_array( $key, $this->value ) ? 'selected' : null );
-					$h  .= "<option {$slt} value='{$key}'>{$value}</option>";
+					$h  .= "<option {$slt} value='" . esc_attr( $key ) . "'>" . esc_html( $value ) . "</option>";
 				}
 			}
 			$h .= '</select>';
@@ -293,7 +293,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     name='{$this->name}'
                     placeholder='{$this->placeholder}'
                     {$this->attr}
-                    >{$this->value}</textarea>";
+                    >".esc_textarea( $this->value )."</textarea>";
 
 			return $h;
 		}
@@ -315,7 +315,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 					foreach ( $this->options as $key => $value ) {
 						$checked = ( in_array( $key, $this->value ) ? 'checked' : null );
 						$h      .= "<label for='{$this->id}-{$key}'>
-                                <input type='checkbox' id='{$this->id}-{$key}' {$checked} name='{$this->name}' value='{$key}'>{$value}
+                                <input type='checkbox' id='{$this->id}-{$key}' {$checked} name='{$this->name}' value='" . esc_attr( $key ) ."'>" . esc_html( $value ) ."
                                 </label>";
 					}
 				}
@@ -340,7 +340,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 				foreach ( $this->options as $key => $value ) {
 					$checked = ( $key == $this->value ? 'checked' : null );
 					$h      .= "<label for='{$this->id}-{$key}'>
-                            <input type='radio' id='{$this->id}-{$key}' {$checked} name='{$this->name}' value='{$key}'>{$value}
+                            <input type='radio' id='{$this->id}-{$key}' {$checked} name='{$this->name}' value='" . esc_attr( $key ) ."'>" . esc_html( $value ) ."
                             </label>";
 				}
 			}
@@ -363,11 +363,11 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h       .= "<div class='rt-image-size-holder d-flex'>";
 			$h       .= "<div class='rt-image-size-width rt-image-size d-flex'>";
 			$h       .= '<label>Width</label>';
-			$h       .= "<input type='number' name='{$this->name}[width]' value='{$width}' />";
+			$h       .= "<input type='number' name='{$this->name}[width]' value='".esc_attr( $width )."' />";
 			$h       .= '</div>';
 			$h       .= "<div class='rt-image-size-height rt-image-size d-flex'>";
 			$h       .= '<label>Height</label>';
-			$h       .= "<input type='number' name='{$this->name}[height]' value='{$height}' />";
+			$h       .= "<input type='number' name='{$this->name}[height]' value='".esc_attr( $height )."' />";
 			$h       .= '</div>';
 			$h       .= "<div class='rt-image-size-crop rt-image-size d-flex'>";
 			$h       .= '<label>Crop</label>';
@@ -375,7 +375,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$cropList = $rtWLS->imageCropType();
 			foreach ( $cropList as $crop => $cropLabel ) {
 				$cSl = ( $crop == $cropV ? 'selected' : null );
-				$h  .= "<option value='{$crop}' {$cSl}>{$cropLabel}</option>";
+				$h  .= "<option value='".esc_attr( $crop )."' {$cSl}>{$cropLabel}</option>";
 			}
 			$h .= '</select>';
 			$h .= '</div>';
