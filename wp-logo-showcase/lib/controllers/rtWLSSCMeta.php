@@ -22,7 +22,7 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 			add_action( 'add_meta_boxes', [ $this, 'sc_meta_boxes' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 			add_action( 'save_post', [ $this, 'save_team_sc_meta_data' ], 10, 3 );
-			add_action( 'edit_form_after_title', [ $this, 'wls_sc_after_title' ] );
+			add_action( 'edit_form_after_title', [ $this, 'wwbels_sc_after_title' ] );
 			add_action( 'admin_init', [ $this, 'rt_wls_pro_remove_all_meta_box' ] );
 			add_filter( 'manage_edit-wlshowcasesc_columns', [ $this, 'arrange_wl_showcase_sc_columns' ] );
 			add_action( 'manage_wlshowcasesc_posts_custom_column', [ $this, 'manage_wl_showcase_sc_columns' ], 10, 2 );
@@ -42,8 +42,8 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 
 			$html  = null;
 			$html .= '<div class="postbox" style="margin-bottom: 0;"><div class="inside">';
-			$html .= '<p><input type="text" onfocus="this.select();" readonly="readonly" value="[logo-showcase id=&quot;' . $post->ID . '&quot; title=&quot;' . $post->post_title . '&quot;]" class="large-text code rt-code-sc">
-			<input type="text" onfocus="this.select();" readonly="readonly" value="&#60;&#63;php echo do_shortcode( &#39;[logo-showcase id=&quot;' . $post->ID . '&quot; title=&quot;' . $post->post_title . '&quot;]&#39; ); &#63;&#62;" class="large-text code rt-code-sc">
+			$html .= '<p><input type="text" onfocus="this.select();" readonly="readonly" value="[logo-showcase id=&quot;' . absint( $post->ID ) . '&quot; title=&quot;' . esc_attr( $post->post_title ) . '&quot;]" class="large-text code rt-code-sc">
+			<input type="text" onfocus="this.select();" readonly="readonly" value="&#60;&#63;php echo do_shortcode( &#39;[logo-showcase id=&quot;' . absint( $post->ID ) . '&quot; title=&quot;' . esc_attr( $post->post_title ) . '&quot;]&#39; ); &#63;&#62;" class="large-text code rt-code-sc">
 			</p>';
 			$html .= '</div></div>';
 
@@ -300,6 +300,10 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 				return $post_id;
 			}
 
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				return $post_id;
+			}
+
 			if ( $rtWLS->shortCodePT != $post->post_type ) {
 				return $post_id;
 			}
@@ -307,7 +311,7 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 			$mates = $rtWLS->wlsScMetaNames();
 
 			foreach ( $mates as $field ) {
-				$rValue = ! empty( $_REQUEST[ $field['name'] ] ) ? $_REQUEST[ $field['name'] ] : null;
+				$rValue = ! empty( $_REQUEST[ $field['name'] ] ) ? wp_unslash( $_REQUEST[ $field['name'] ] ) : null;
 				$value  = $rtWLS->sanitize( $field, $rValue );
 
 				if ( empty( $field['multiple'] ) ) {

@@ -203,6 +203,10 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 				return $post_id;
 			}
 
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				return $post_id;
+			}
+
 			if ( $rtWLS->post_type != $post->post_type ) {
 				return $post_id;
 			}
@@ -210,7 +214,7 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 			$mates = $rtWLS->rtLogoMetaNames();
 
 			foreach ( $mates as $field ) {
-				$rValue = ! empty( $_REQUEST[ $field['name'] ] ) ? $_REQUEST[ $field['name'] ] : null;
+				$rValue = ! empty( $_REQUEST[ $field['name'] ] ) ? wp_unslash( $_REQUEST[ $field['name'] ] ) : null;
 				$value  = $rtWLS->sanitize( $field, $rValue );
 
 				if ( empty( $field['multiple'] ) ) {

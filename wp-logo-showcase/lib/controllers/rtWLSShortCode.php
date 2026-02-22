@@ -212,7 +212,7 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 					$image_size = ( $wls_image_size && 'wls_custom_image_size' != $wls_image_size ) ? $wls_image_size : 'full';
 
 					$html .= '<div class="rt-container-fluid rt-wpls" id="' . esc_attr( $containerID ) . '" data-sc-id="' . absint( $scID ) . '">';
-					$html .= '<div class="rt-row ' . esc_attr( $layout ) . ' ' . esc_attr( $carouselClass ) . '" ' . $carouselAttribute . ' ' . $carouselDir . '>';
+					$html .= '<div class="rt-row ' . esc_attr( $layout ) . ' ' . esc_attr( $carouselClass ) . '" ' . $carouselAttribute . ' ' . esc_attr( $carouselDir ) . '>';
 
 					while ( $logoQuery->have_posts() ) :
 						$logoQuery->the_post();
@@ -244,7 +244,7 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 								$cropImg = $rtWLS->rtImageReSize( $imgS[0], $imgSize['width'], $imgSize['height'], $c );
 
 								if ( $cropImg ) {
-									$arg['img_src'] = "<img title='{$arg['title']}' src='{$cropImg}' width='{$imgSize['width']}' height='{$imgSize['height']}' class='{$imgClass}' alt='{$arg['alt_text']}'>";
+									$arg['img_src'] = "<img title='" . esc_attr( $arg['title'] ) . "' src='" . esc_url( $cropImg ) . "' width='" . absint( $imgSize['width'] ) . "' height='" . absint( $imgSize['height'] ) . "' class='" . esc_attr( $imgClass ) . "' alt='" . esc_attr( $arg['alt_text'] ) . "'>";
 								}
 							}
 						}
@@ -309,7 +309,7 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 			$cCss     = ! empty( $settings['custom_css'] ) ? trim( $settings['custom_css'] ) : null;
 
 			if ( $cCss ) {
-				$css .= $cCss;
+				$css .= wp_strip_all_tags( $cCss );
 			}
 
 			$css .= '</style>';

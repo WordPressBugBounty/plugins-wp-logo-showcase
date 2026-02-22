@@ -27,7 +27,7 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 			global $rtWLS;
 			$msg   = null;
 			$error = true;
-			if ( wp_verify_nonce($rtWLS->getNonce(),$rtWLS->nonceText()) && current_user_can( 'administrator' ) ) {
+			if ( wp_verify_nonce($rtWLS->getNonce(),$rtWLS->nonceText()) && current_user_can( 'manage_options' ) ) {
 				unset( $_REQUEST['action'] );
 				unset( $_REQUEST[ $rtWLS->nonceId() ] );
 				unset( $_REQUEST['_wp_http_referer'] );
@@ -37,7 +37,7 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 
 				foreach ( $fields as $field ) {
 					$type   = ! empty( $field['type'] ) ? $field['type'] : '';
-					$rValue = ( ! empty( $_REQUEST[ $field['name'] ] ) ? $_REQUEST[ $field['name'] ] : null );
+					$rValue = ( ! empty( $_REQUEST[ $field['name'] ] ) ? wp_unslash( $_REQUEST[ $field['name'] ] ) : null );
 
 					if ( $type == 'custom_css' ) {
 						$value[ $field['name'] ] = wp_filter_nohtml_kses( $rValue );
@@ -76,6 +76,12 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 		public function shortCodeList() {
 			global $rtWLS;
 
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				wp_die();
+			}
+
+			check_ajax_referer( $rtWLS->nonceText(), $rtWLS->nonceId() );
+
 			$html = null;
 			$scQ  = new WP_Query(
 				[
@@ -95,7 +101,7 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 				$html .= "<option value=''>" . esc_html__( 'Default', 'wp-logo-showcase' ) . '</option>';
 				while ( $scQ->have_posts() ) {
 					$scQ->the_post();
-					$html .= "<option value='" . get_the_ID() . "'>" . get_the_title() . '</option>';
+					$html .= "<option value='" . absint( get_the_ID() ) . "'>" . esc_html( get_the_title() ) . '</option>';
 				}
 				$html .= '</select>';
 				$html .= '</div>';

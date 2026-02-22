@@ -49,6 +49,7 @@ if ( ! class_exists( 'rtWLSSCButton' ) ) :
 				echo "background: url('" . esc_url( $rtWLS->assetsUrl ) . "images/icon-scg.png');";
 				echo '}';
 				echo '</style>';
+				echo '<script>var wlsMceNonce = "' . esc_js( wp_create_nonce( $rtWLS->nonceText() ) ) . '", wlsMceNonceId = "' . esc_js( $rtWLS->nonceId() ) . '";</script>';
 			}
 		}
 

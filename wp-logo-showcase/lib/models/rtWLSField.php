@@ -85,7 +85,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$this->setArgument( $attr );
 			$html  = null;
 			$html  = null;
-			$html .= "<div class='rt-field-wrapper {$this->holderClass}' id='{$this->holderID}'>";
+			$html .= "<div class='rt-field-wrapper " . esc_attr( $this->holderClass ) . "' id='" . esc_attr( $this->holderID ) . "'>";
 			$html .= sprintf(
 				'<div class="rt-label">%s</div>',
 				$this->label ? sprintf( '<label for="">%s</label>', $this->label ) : ''
@@ -133,7 +133,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			}
 
 			if ( $this->description ) {
-				$html .= "<p class='description'>{$this->description}</p>";
+				$html .= "<p class='description'>" . wp_kses_post( $this->description ) . '</p>';
 			}
 
 			$html .= '</div>'; // field
@@ -151,12 +151,11 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h  = null;
 			$h .= "<input
                     type='text'
-                    class='{$this->class}'
-                    id='{$this->id}'
-                    value='".esc_attr( $this->value )."'
-                    name='{$this->name}'
-                    placeholder='{$this->placeholder}'
-                    {$this->attr}
+                    class='" . esc_attr( $this->class ) . "'
+                    id='" . esc_attr( $this->id ) . "'
+                    value='" . esc_attr( $this->value ) . "'
+                    name='" . esc_attr( $this->name ) . "'
+                    placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
 
 			return $h;
@@ -171,12 +170,11 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h  = null;
 			$h .= "<input
                     type='text'
-                    class='{$this->class} rt-color'
-                    id='{$this->id}'
-                    value='".esc_attr( $this->value )."'
-                    name='{$this->name}'
-                    placeholder='{$this->placeholder}'
-                    {$this->attr}
+                    class='" . esc_attr( $this->class ) . " rt-color'
+                    id='" . esc_attr( $this->id ) . "'
+                    value='" . esc_attr( $this->value ) . "'
+                    name='" . esc_attr( $this->name ) . "'
+                    placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
 
 			return $h;
@@ -193,15 +191,15 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h .= '<p class="description" style="color: red">Please use default customizer to add your css. This option is deprecated.</p>';
 
 			$h .= '<div class="custom_css_container">';
-			$h .= "<div name='{$this->name}' id='ret-" . wp_rand() . "' class='custom-css'>";
+			$h .= "<div name='" . esc_attr( $this->name ) . "' id='ret-" . wp_rand() . "' class='custom-css'>";
 			$h .= '</div>';
 			$h .= '</div>';
 			$h .= "<textarea
                         style='display: none;'
                         class='custom_css_textarea'
-                        id='{$this->id}'
-                        name='{$this->name}'
-                        >".esc_textarea( $this->value )."</textarea>";
+                        id='" . esc_attr( $this->id ) . "'
+                        name='" . esc_attr( $this->name ) . "'
+                        >" . esc_textarea( $this->value ) . "</textarea>";
 			$h .= '</div>';
 
 			return $h;
@@ -216,12 +214,11 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h  = null;
 			$h .= "<input
                     type='url'
-                    class='{$this->class}'
-                    id='{$this->id}'
-                    value='".esc_attr( $this->value )."'
-                    name='{$this->name}'
-                    placeholder='{$this->placeholder}'
-                    {$this->attr}
+                    class='" . esc_attr( $this->class ) . "'
+                    id='" . esc_attr( $this->id ) . "'
+                    value='" . esc_attr( $this->value ) . "'
+                    name='" . esc_attr( $this->name ) . "'
+                    placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
 
 			return $h;
@@ -236,12 +233,11 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h  = null;
 			$h .= "<input
                     type='number'
-                    class='{$this->class}'
-                    id='{$this->id}'
+                    class='" . esc_attr( $this->class ) . "'
+                    id='" . esc_attr( $this->id ) . "'
                     value='" . esc_attr( $this->value ) . "'
                     name='" . esc_attr( $this->name ) . "'
-                    placeholder='{$this->placeholder}'
-                    {$this->attr}
+                    placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
 
 			return $h;
@@ -263,9 +259,9 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 				$this->value = [ $this->value ];
 			}
 
-			$h .= "<select name='{$this->name}' id='{$this->id}' class='{$this->class}' {$this->attr}>";
+			$h .= "<select name='" . esc_attr( $this->name ) . "' id='" . esc_attr( $this->id ) . "' class='" . esc_attr( $this->class ) . "'>";
 			if ( $this->blank ) {
-				$h .= "<option value=''>{$this->blank}</option>";
+				$h .= "<option value=''>" . esc_html( $this->blank ) . '</option>';
 			}
 			if ( is_array( $this->options ) && ! empty( $this->options ) ) {
 				foreach ( $this->options as $key => $value ) {
@@ -288,12 +284,11 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h .= "<textarea
 					rows='8'
 					cols='40'
-                    class='{$this->class} rt-textarea'
-                    id='{$this->id}'
-                    name='{$this->name}'
-                    placeholder='{$this->placeholder}'
-                    {$this->attr}
-                    >".esc_textarea( $this->value )."</textarea>";
+                    class='" . esc_attr( $this->class ) . " rt-textarea'
+                    id='" . esc_attr( $this->id ) . "'
+                    name='" . esc_attr( $this->name ) . "'
+                    placeholder='" . esc_attr( $this->placeholder ) . "'
+                    >" . esc_textarea( $this->value ) . "</textarea>";
 
 			return $h;
 		}
@@ -310,19 +305,19 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 				$this->value = ( is_array( $this->value ) && ! empty( $this->value ) ? $this->value : [] );
 			}
 			if ( $this->multiple ) {
-				$h .= "<div class='checkbox-group {$this->alignment}' id='{$this->id}'>";
+				$h .= "<div class='checkbox-group " . esc_attr( $this->alignment ) . "' id='" . esc_attr( $this->id ) . "'>";
 				if ( is_array( $this->options ) && ! empty( $this->options ) ) {
 					foreach ( $this->options as $key => $value ) {
 						$checked = ( in_array( $key, $this->value ) ? 'checked' : null );
-						$h      .= "<label for='{$this->id}-{$key}'>
-                                <input type='checkbox' id='{$this->id}-{$key}' {$checked} name='{$this->name}' value='" . esc_attr( $key ) ."'>" . esc_html( $value ) ."
+						$h      .= "<label for='" . esc_attr( $this->id ) . '-' . esc_attr( $key ) . "'>
+                                <input type='checkbox' id='" . esc_attr( $this->id ) . '-' . esc_attr( $key ) . "' {$checked} name='" . esc_attr( $this->name ) . "' value='" . esc_attr( $key ) ."'>" . esc_html( $value ) ."
                                 </label>";
 					}
 				}
 				$h .= '</div>';
 			} else {
 				$checked = ( $this->value ? 'checked' : null );
-				$h      .= "<label><input type='checkbox' {$checked} id='{$this->id}' name='{$this->name}' value='1' {$this->attr}/>{$this->option}</label>";
+				$h      .= "<label><input type='checkbox' {$checked} id='" . esc_attr( $this->id ) . "' name='" . esc_attr( $this->name ) . "' value='1' />" . esc_html( $this->option ) . "</label>";
 			}
 
 			return $h;
@@ -335,12 +330,12 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 		 */
 		private function radioField() {
 			$h  = null;
-			$h .= "<div class='radio-group {$this->alignment}' id='{$this->id}'>";
+			$h .= "<div class='radio-group " . esc_attr( $this->alignment ) . "' id='" . esc_attr( $this->id ) . "'>";
 			if ( is_array( $this->options ) && ! empty( $this->options ) ) {
 				foreach ( $this->options as $key => $value ) {
 					$checked = ( $key == $this->value ? 'checked' : null );
-					$h      .= "<label for='{$this->id}-{$key}'>
-                            <input type='radio' id='{$this->id}-{$key}' {$checked} name='{$this->name}' value='" . esc_attr( $key ) ."'>" . esc_html( $value ) ."
+					$h      .= "<label for='" . esc_attr( $this->id ) . '-' . esc_attr( $key ) . "'>
+                            <input type='radio' id='" . esc_attr( $this->id ) . '-' . esc_attr( $key ) . "' {$checked} name='" . esc_attr( $this->name ) . "' value='" . esc_attr( $key ) ."'>" . esc_html( $value ) ."
                             </label>";
 				}
 			}
@@ -363,15 +358,15 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h       .= "<div class='rt-image-size-holder d-flex'>";
 			$h       .= "<div class='rt-image-size-width rt-image-size d-flex'>";
 			$h       .= '<label>Width</label>';
-			$h       .= "<input type='number' name='{$this->name}[width]' value='".esc_attr( $width )."' />";
+			$h       .= "<input type='number' name='" . esc_attr( $this->name ) . "[width]' value='" . esc_attr( $width ) . "' />";
 			$h       .= '</div>';
 			$h       .= "<div class='rt-image-size-height rt-image-size d-flex'>";
 			$h       .= '<label>Height</label>';
-			$h       .= "<input type='number' name='{$this->name}[height]' value='".esc_attr( $height )."' />";
+			$h       .= "<input type='number' name='" . esc_attr( $this->name ) . "[height]' value='" . esc_attr( $height ) . "' />";
 			$h       .= '</div>';
 			$h       .= "<div class='rt-image-size-crop rt-image-size d-flex'>";
 			$h       .= '<label>Crop</label>';
-			$h       .= "<select name='{$this->name}[crop]' class='rt-select2'>";
+			$h       .= "<select name='" . esc_attr( $this->name ) . "[crop]' class='rt-select2'>";
 			$cropList = $rtWLS->imageCropType();
 			foreach ( $cropList as $crop => $cropLabel ) {
 				$cSl = ( $crop == $cropV ? 'selected' : null );

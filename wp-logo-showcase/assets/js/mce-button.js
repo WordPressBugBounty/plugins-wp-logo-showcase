@@ -48,9 +48,13 @@
 
         function putScList(){
                 var dialogBody = jQuery( '#wls-sc-dialog-body' )
-                jQuery.post( ajaxurl, {
+                var data = {
                     action: 'wlsShortCodeList'
-                }, function( response ) {
+                };
+                if ( typeof wlsMceNonceId !== 'undefined' && typeof wlsMceNonce !== 'undefined' ) {
+                    data[ wlsMceNonceId ] = wlsMceNonce;
+                }
+                jQuery.post( ajaxurl, data, function( response ) {
                     dialogBody.html(response);
                     console.log(response);
                 });
