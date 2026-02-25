@@ -47,18 +47,13 @@
         });
 
         function putScList(){
-                var dialogBody = jQuery( '#wls-sc-dialog-body' )
-                var data = {
-                    action: 'wlsShortCodeList'
-                };
-                if ( typeof wlsMceNonceId !== 'undefined' && typeof wlsMceNonce !== 'undefined' ) {
-                    data[ wlsMceNonceId ] = wlsMceNonce;
-                }
-                jQuery.post( ajaxurl, data, function( response ) {
-                    dialogBody.html(response);
-                    console.log(response);
-                });
-
+            var dialogBody = jQuery( '#wls-sc-dialog-body' )
+            jQuery.post( ajaxurl, {
+                action: 'wlsShortCodeList'
+            }, function( response ) {
+                dialogBody.html(response);
+                console.log(response);
+            });
         }
 
     });

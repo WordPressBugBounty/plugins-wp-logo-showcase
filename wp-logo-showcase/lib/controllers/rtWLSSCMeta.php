@@ -22,7 +22,7 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 			add_action( 'add_meta_boxes', [ $this, 'sc_meta_boxes' ] );
 			add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 			add_action( 'save_post', [ $this, 'save_team_sc_meta_data' ], 10, 3 );
-			add_action( 'edit_form_after_title', [ $this, 'wwbels_sc_after_title' ] );
+			add_action( 'edit_form_after_title', [ $this, 'wls_sc_after_title' ] );
 			add_action( 'admin_init', [ $this, 'rt_wls_pro_remove_all_meta_box' ] );
 			add_filter( 'manage_edit-wlshowcasesc_columns', [ $this, 'arrange_wl_showcase_sc_columns' ] );
 			add_action( 'manage_wlshowcasesc_posts_custom_column', [ $this, 'manage_wl_showcase_sc_columns' ], 10, 2 );

@@ -80,8 +80,6 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 				wp_die();
 			}
 
-			check_ajax_referer( $rtWLS->nonceText(), $rtWLS->nonceId() );
-
 			$html = null;
 			$scQ  = new WP_Query(
 				[

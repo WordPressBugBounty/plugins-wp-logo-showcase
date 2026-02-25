@@ -4,7 +4,7 @@ Donate link:
 Tags: logo slider, logo showcase, carousel, client logo, logo carousel
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -124,6 +124,9 @@ If you like The Post Grid Plugin, then consider checking out our other WordPress
 
 
 == Changelog ==
+
+= 1.5.2 ( February 25, 2026) =
+* Fixed: Shortcode generation fatal issue.
 
 = 1.5.1 ( February 22, 2026) =
 * Updated: Security Improvement.
