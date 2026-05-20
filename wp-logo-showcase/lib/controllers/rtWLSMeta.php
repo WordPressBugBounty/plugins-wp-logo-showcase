@@ -62,25 +62,19 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 		public function manage_wlshowcase_columns( $column, $id ) {
 			switch ( $column ) {
 				case 'wls_logo_thumb':
-					if ( function_exists( 'the_post_thumbnail' ) ) {
-						$post_thumbnail_id  = get_post_thumbnail_id( $id );
-						$post_thumbnail_img = wp_get_attachment_image_src( $post_thumbnail_id, 'thumbnail' );
-						$post_thumbnail_img = $post_thumbnail_img[0];
+					$thumb_id  = get_post_thumbnail_id( $id );
+					$thumb_src = $thumb_id ? wp_get_attachment_image_src( $thumb_id, 'thumbnail' ) : false;
 
-						if ( $post_thumbnail_img != '' ) {
-							echo '<img src="' . esc_url( $post_thumbnail_img ) . '" />';
-						} else {
-							echo 'No logo added.';
-						}
+					if ( is_array( $thumb_src ) && ! empty( $thumb_src[0] ) ) {
+						echo '<img src="' . esc_url( $thumb_src[0] ) . '" alt="" />';
 					} else {
-						echo 'No logo added.';
+						echo esc_html__( 'No logo added.', 'wp-logo-showcase' );
 					}
 					break;
 
 				default:
 					break;
 			}
-
 		}
 
 		/**
@@ -135,7 +129,7 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 				]
 			);
 
-			$nonce = wp_create_nonce( $rtWLS->nonceText() );
+			$nonce = wp_create_nonce( $rtWLS->nonceText( 'logo_save' ) );
 
 			wp_localize_script(
 				'rt-wls-admin',
@@ -173,7 +167,7 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 		public function rt_wls_logo_meta_information( $post ) {
 			global $rtWLS;
 
-			wp_nonce_field( $rtWLS->nonceText(), $rtWLS->nonceId() );
+			wp_nonce_field( $rtWLS->nonceText( 'logo_save' ), $rtWLS->nonceId() );
 
 			$html  = null;
 			$html .= '<div class="rt-wls-meta-holder">';
@@ -199,7 +193,12 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 
 			global $rtWLS;
 
-			if ( ! wp_verify_nonce( $rtWLS->getNonce(),$rtWLS->nonceText()) ) {
+			// Only act on our post type — without this the nonce check would reject every other post type save.
+			if ( ! isset( $post->post_type ) || $rtWLS->post_type !== $post->post_type ) {
+				return $post_id;
+			}
+
+			if ( ! $rtWLS->verifyNonce( 'logo_save' ) ) {
 				return $post_id;
 			}
 
@@ -207,14 +206,10 @@ if ( ! class_exists( 'rtWLSMeta' ) ) :
 				return $post_id;
 			}
 
-			if ( $rtWLS->post_type != $post->post_type ) {
-				return $post_id;
-			}
-
 			$mates = $rtWLS->rtLogoMetaNames();
 
 			foreach ( $mates as $field ) {
-				$rValue = ! empty( $_REQUEST[ $field['name'] ] ) ? wp_unslash( $_REQUEST[ $field['name'] ] ) : null;
+				$rValue = ! empty( $_POST[ $field['name'] ] ) ? wp_unslash( $_POST[ $field['name'] ] ) : null;
 				$value  = $rtWLS->sanitize( $field, $rValue );
 
 				if ( empty( $field['multiple'] ) ) {

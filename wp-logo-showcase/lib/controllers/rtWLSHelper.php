@@ -16,36 +16,27 @@ if ( ! class_exists( 'rtWLSHelper' ) ) :
 	 */
 	class rtWLSHelper {
 		/**
-		 * Nonce verify upon activity
+		 * Read the submitted nonce value from POST only.
 		 *
-		 * @return bool
+		 * @return string|null
 		 */
-		public function verifyNonce() {
-			global $rtWLS;
-
-			$nonce     = isset( $_REQUEST[ $this->nonceId() ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ $this->nonceId() ] ) ) : null;
-			$nonceText = $rtWLS->nonceText();
-
-			if ( ! wp_verify_nonce( $nonce, $nonceText ) ) {
-				return false;
-			}
-
-			return true;
-		}
-
-		public function getNonce(  ) {
+		public function getNonce() {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return isset( $_REQUEST[  $this->nonceId() ] ) ? sanitize_text_field( wp_unslash( $_REQUEST[ $this->nonceId() ] ) ) : null;
-
+			return isset( $_POST[ $this->nonceId() ] ) ? sanitize_text_field( wp_unslash( $_POST[ $this->nonceId() ] ) ) : null;
 		}
 
 		/**
-		 * Generate nonce text
+		 * Generate per-action nonce action string.
 		 *
+		 * @param string|null $context Optional context that scopes the nonce to a single action.
 		 * @return string
 		 */
-		public function nonceText() {
-			return 'rt_wls_nonce_secret';
+		public function nonceText( $context = null ) {
+			$base = 'rt_wls_nonce_secret';
+			if ( ! empty( $context ) && is_string( $context ) ) {
+				$base .= '_' . preg_replace( '/[^a-z0-9_]/i', '', $context );
+			}
+			return $base;
 		}
 
 		/**
@@ -55,6 +46,16 @@ if ( ! class_exists( 'rtWLSHelper' ) ) :
 		 */
 		public function nonceId() {
 			return 'rt_wls_nonce';
+		}
+
+		/**
+		 * Verify a posted nonce against a specific context.
+		 *
+		 * @param string|null $context Optional context passed to {@see nonceText()}.
+		 * @return bool
+		 */
+		public function verifyNonce( $context = null ) {
+			return (bool) wp_verify_nonce( $this->getNonce(), $this->nonceText( $context ) );
 		}
 
 		/**
@@ -204,18 +205,20 @@ if ( ! class_exists( 'rtWLSHelper' ) ) :
 					if ( $type == 'text' || $type == 'number' || $type == 'select' || $type == 'checkbox' || $type == 'radio' ) {
 						$newValue = sanitize_text_field( $value );
 					} elseif ( $type == 'url' ) {
-						$newValue = esc_url( $value );
+						$newValue = esc_url_raw( $value );
 					} elseif ( $type == 'textarea' ) {
-						$newValue = wp_kses_post( $value );
+						$newValue = wp_kses( $value, $this->allowed_description_html() );
 					} elseif ( $type == 'colorpicker' ) {
 						$newValue = $this->sanitize_hex_color( $value );
 					} elseif ( $type == 'image_size' ) {
+						// Only accept the three known sub-keys — drop anything else the
+						// caller may try to inject via crafted POST data like
+						// wls_custom_image_size[<arbitrary>]=…
 						$newValue = [];
-
 						if ( is_array( $value ) ) {
-							foreach ( $value as $k => $v ) {
-								$newValue[ $k ] = esc_attr( $v );
-							}
+							$newValue['width']  = isset( $value['width'] ) ? absint( $value['width'] ) : 0;
+							$newValue['height'] = isset( $value['height'] ) ? absint( $value['height'] ) : 0;
+							$newValue['crop']   = ! empty( $value['crop'] );
 						}
 					} else {
 						$newValue = sanitize_text_field( $value );
@@ -247,6 +250,73 @@ if ( ! class_exists( 'rtWLSHelper' ) ) :
 			if ( preg_match( '|^#([A-Fa-f0-9]{3}){1,2}$|', $color ) ) {
 				return $color;
 			}
+		}
+
+		/**
+		 * Allowlisted HTML for logo descriptions — intentionally narrow.
+		 * No iframes, scripts, embeds, style/script attributes — only basic
+		 * inline formatting & links. wp_kses_post is too permissive for what
+		 * is essentially a caption field.
+		 *
+		 * @return array
+		 */
+		public function allowed_description_html() {
+			return [
+				'a'      => [
+					'href'   => true,
+					'title'  => true,
+					'rel'    => true,
+					'target' => true,
+				],
+				'br'     => [],
+				'em'     => [],
+				'strong' => [],
+				'b'      => [],
+				'i'      => [],
+				'span'   => [ 'class' => true ],
+				'p'      => [ 'class' => true ],
+				'ul'     => [],
+				'ol'     => [],
+				'li'     => [],
+			];
+		}
+
+		/**
+		 * Sanitize a block of custom CSS — strips tags, comments, and any
+		 * external resource loads (@import, url(http…), JS hooks like
+		 * expression(), -moz-binding, behavior).
+		 *
+		 * Admins can still write standard CSS; only known-dangerous
+		 * patterns are removed.
+		 *
+		 * @param string $css Raw CSS coming from the settings form.
+		 * @return string
+		 */
+		public function sanitize_custom_css( $css ) {
+			if ( ! is_string( $css ) ) {
+				return '';
+			}
+
+			$css = wp_strip_all_tags( $css );
+
+			// Drop CSS block & line comments — they can hide injections from a glance.
+			$css = preg_replace( '#/\*.*?\*/#s', '', $css );
+			$css = preg_replace( '#(^|\n)\s*//[^\n]*#', '$1', $css );
+
+			// Block remote loads and JS bridges.
+			$patterns = [
+				'/@import\b[^;]*;?/i',
+				'/url\s*\(\s*[\'"]?\s*(?:https?:)?\/\/[^)]*\)/i',
+				'/expression\s*\(/i',
+				'/-moz-binding\s*:/i',
+				'/behavior\s*:/i',
+				'/javascript\s*:/i',
+				'/vbscript\s*:/i',
+				'/data\s*:[^;]*base64/i',
+			];
+			$css = preg_replace( $patterns, '', $css );
+
+			return trim( $css );
 		}
 
 		/**

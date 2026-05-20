@@ -5,6 +5,10 @@
  * @package RT_WSL
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $desc   = null;
 $itemsA = [];
 
@@ -18,8 +22,10 @@ if ( $linkType == 'no_link' || ! $url ) {
 	$itemsA['title'] = "<h3><a href='" . esc_url( $url ) . "' {$target}>" . esc_html( $title ) . '</a></h3>';
 }
 
+global $rtWLS;
+
 $desc                 .= "<div class='logo-description'>";
-$desc                 .= apply_filters( 'the_content', $description );
+$desc                 .= wpautop( wp_kses( (string) $description, $rtWLS->allowed_description_html() ) );
 $desc                 .= '</div>';
 $itemsA['description'] = $desc;
 

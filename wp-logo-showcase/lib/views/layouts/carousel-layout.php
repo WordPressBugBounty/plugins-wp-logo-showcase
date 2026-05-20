@@ -5,6 +5,10 @@
  * @package RT_WSL
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 global $rtWLS;
 
 $desc   = null;
@@ -21,7 +25,9 @@ if ( $linkType == 'no_link' || ! $url ) {
 }
 
 $desc                 .= "<div class='logo-description'>";
-$desc                 .= apply_filters( 'the_content', $description );
+// wpautop adds basic paragraph wrapping; wp_kses restricts to safe inline tags
+// (avoid the_content filter chain so plugin shortcodes can't piggy-back).
+$desc                 .= wpautop( wp_kses( (string) $description, $rtWLS->allowed_description_html() ) );
 $desc                 .= '</div>';
 $itemsA['description'] = $desc;
 

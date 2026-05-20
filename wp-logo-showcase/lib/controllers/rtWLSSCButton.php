@@ -49,6 +49,19 @@ if ( ! class_exists( 'rtWLSSCButton' ) ) :
 				echo "background: url('" . esc_url( $rtWLS->assetsUrl ) . "images/icon-scg.png');";
 				echo '}';
 				echo '</style>';
+
+				// Expose nonce + field name for mce-button.js AJAX request.
+				$nonce_value = wp_create_nonce( $rtWLS->nonceText( 'sc_list' ) );
+				$nonce_id    = $rtWLS->nonceId();
+				printf(
+					'<script>window.wlsSCButton = %s;</script>',
+					wp_json_encode(
+						[
+							'nonce'   => $nonce_value,
+							'nonceID' => $nonce_id,
+						]
+					)
+				);
 			}
 		}
 

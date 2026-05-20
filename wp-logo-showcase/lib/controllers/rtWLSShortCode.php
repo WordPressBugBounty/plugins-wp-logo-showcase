@@ -99,8 +99,10 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 					$Mcol = 2;
 				}
 
-				$arg['linkType'] = ( isset( $scMeta['wls_link_type'][0] ) ? $scMeta['wls_link_type'][0] : 'new_window' );
-				$arg['nofollow'] = isset( $scMeta['wls_nofollow'][0] ) && ! empty( $scMeta['wls_nofollow'][0] ) ? true : false;
+				$linkTypeRaw     = ( isset( $scMeta['wls_link_type'][0] ) ? $scMeta['wls_link_type'][0] : 'new_window' );
+				$allowedLinks    = array_keys( $rtWLS->scLinkTypes() );
+				$arg['linkType'] = in_array( $linkTypeRaw, $allowedLinks, true ) ? $linkTypeRaw : 'new_window';
+				$arg['nofollow'] = ! empty( $scMeta['wls_nofollow'][0] );
 
 				/* Argument create */
 				$args              = [];
@@ -112,9 +114,10 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 				$limit                  = ( ! empty( $scMeta['wls_limit'][0] ) ? ( $scMeta['wls_limit'][0] === '-1' ? 10000000 : (int) $scMeta['wls_limit'][0] ) : 10000000 );
 				$args['posts_per_page'] = $limit;
 
-				// Taxonomy.
+				// Taxonomy — coerce to positive integers, drop everything else.
 				$taxQ = [];
 				$cats = ( ! empty( $scMeta['wls_categories'] ) ? $scMeta['wls_categories'] : [] );
+				$cats = is_array( $cats ) ? array_filter( array_map( 'absint', $cats ) ) : [];
 
 				if ( ! empty( $cats ) ) {
 					$taxQ[] = [
@@ -128,16 +131,19 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 					$args['tax_query'] = $itemIdsArgs['tax_query'] = $taxQ;
 				}
 
-				// Order.
-				$order_by = ( ! empty( $scMeta['wls_order_by'][0] ) ? $scMeta['wls_order_by'][0] : null );
-				$order    = ( ! empty( $scMeta['wls_order'][0] ) ? $scMeta['wls_order'][0] : null );
+				// Order — validate against plugin allowlists before passing to WP_Query.
+				$order_by_raw = ( ! empty( $scMeta['wls_order_by'][0] ) ? $scMeta['wls_order_by'][0] : null );
+				$order_raw    = ( ! empty( $scMeta['wls_order'][0] ) ? $scMeta['wls_order'][0] : null );
 
-				if ( $order ) {
-					$args['order'] = $order;
+				$allowed_order_by = array_keys( $rtWLS->scOrderBy() );
+				$allowed_order    = array_keys( $rtWLS->scOrder() );
+
+				if ( $order_raw && in_array( $order_raw, $allowed_order, true ) ) {
+					$args['order'] = $order_raw;
 				}
 
-				if ( $order_by ) {
-					$args['orderby'] = $order_by;
+				if ( $order_by_raw && in_array( $order_by_raw, $allowed_order_by, true ) ) {
+					$args['orderby'] = $order_by_raw;
 				}
 
 				$col          = $col == 5 ? '24' : round( 12 / $col );
@@ -169,21 +175,21 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 							$options = $scMeta['wls_carousel_options'];
 						}
 
-						$carouselAttribute = "data-slick='{
-                        \"slidesToShow\": {$slidesToShow},
-                        \"slidesToScroll\": {$slidesToScroll},
-                        \"speed\": {$speed},
-                        \"dots\": " . ( in_array( 'dots', $options ) ? 'true' : 'false' ) . ',
-                        "arrows": ' . ( in_array( 'arrows', $options ) ? 'true' : 'false' ) . ',
-                        "infinite": ' . ( in_array( 'infinite', $options ) ? 'true' : 'false' ) . ',
-                        "pauseOnHover": ' . ( in_array( 'pauseOnHover', $options ) ? 'true' : 'false' ) . ',
-                        "autoplay": ' . ( in_array( 'autoplay', $options ) ? 'true' : 'false' ) . ',
-                        "rtl": ' . ( in_array( 'rtl', $options ) ? 'true' : 'false' ) . "
-                        }'";
+						$slick = [
+							'slidesToShow'   => $slidesToShow,
+							'slidesToScroll' => $slidesToScroll,
+							'speed'          => $speed,
+							'dots'           => in_array( 'dots', $options, true ),
+							'arrows'         => in_array( 'arrows', $options, true ),
+							'infinite'       => in_array( 'infinite', $options, true ),
+							'pauseOnHover'   => in_array( 'pauseOnHover', $options, true ),
+							'autoplay'       => in_array( 'autoplay', $options, true ),
+							'rtl'            => in_array( 'rtl', $options, true ),
+						];
 
-						$carouselAttribute = preg_replace( '/\s+/S', ' ', $carouselAttribute );
+						$carouselAttribute = sprintf( ' data-slick="%s"', esc_attr( wp_json_encode( $slick ) ) );
 
-						$carouselDir = ( in_array( 'rtl', $options ) ? ' dir="rtl"' : null );
+						$carouselDir = ( in_array( 'rtl', $options, true ) ? ' dir="rtl"' : '' );
 					}
 
 					$containerID = 'rt-container-' . $rand;
@@ -202,17 +208,23 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 					$wls_image_size = ! empty( $scMeta['wls_image_size'][0] ) ? $scMeta['wls_image_size'][0] : null;
 
 					if ( $wls_image_size && 'wls_custom_image_size' == $wls_image_size ) {
-						$imgReSize             = true;
-						$wls_custom_image_size = maybe_unserialize( $scMeta['wls_custom_image_size'][0] );
-						$imgSize['width']      = isset( $wls_custom_image_size['width'] ) ? absint( $wls_custom_image_size['width'] ) : 180;
-						$imgSize['height']     = isset( $wls_custom_image_size['height'] ) ? absint( $wls_custom_image_size['height'] ) : 90;
-						$imgSize['crop']       = isset( $wls_custom_image_size['crop'] ) ? ( $wls_custom_image_size['crop'] ? true : false ) : false;
+						$imgReSize = true;
+						// Use keyed get_post_meta so WP handles unserialization safely instead of
+						// calling maybe_unserialize() on a raw blob from the all-meta lookup.
+						$wls_custom_image_size = get_post_meta( $scID, 'wls_custom_image_size', true );
+						if ( ! is_array( $wls_custom_image_size ) ) {
+							$wls_custom_image_size = [];
+						}
+						$imgSize['width']  = isset( $wls_custom_image_size['width'] ) ? absint( $wls_custom_image_size['width'] ) : 180;
+						$imgSize['height'] = isset( $wls_custom_image_size['height'] ) ? absint( $wls_custom_image_size['height'] ) : 90;
+						$imgSize['crop']   = ! empty( $wls_custom_image_size['crop'] );
 					}
 
 					$image_size = ( $wls_image_size && 'wls_custom_image_size' != $wls_image_size ) ? $wls_image_size : 'full';
 
 					$html .= '<div class="rt-container-fluid rt-wpls" id="' . esc_attr( $containerID ) . '" data-sc-id="' . absint( $scID ) . '">';
-					$html .= '<div class="rt-row ' . esc_attr( $layout ) . ' ' . esc_attr( $carouselClass ) . '" ' . $carouselAttribute . ' ' . esc_attr( $carouselDir ) . '>';
+					// $carouselAttribute and $carouselDir are pre-built with esc_attr() (or fixed literals) so they're safe to inject here.
+					$html .= '<div class="rt-row ' . esc_attr( $layout ) . ' ' . esc_attr( $carouselClass ) . '"' . $carouselAttribute . $carouselDir . '>';
 
 					while ( $logoQuery->have_posts() ) :
 						$logoQuery->the_post();
@@ -239,8 +251,8 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 							$imgS           = wp_get_attachment_image_src( get_post_thumbnail_id(), 'full' );
 							$arg['img_src'] = $img;
 
-							if ( 'full' == $image_size && ! empty( $imgSize ) ) {
-								$c       = ( ! empty( $imgSize['crop'] ) ? true : false );
+							if ( 'full' == $image_size && ! empty( $imgSize ) && is_array( $imgS ) && ! empty( $imgS[0] ) ) {
+								$c       = ! empty( $imgSize['crop'] );
 								$cropImg = $rtWLS->rtImageReSize( $imgS[0], $imgSize['width'], $imgSize['height'], $c );
 
 								if ( $cropImg ) {
@@ -309,7 +321,8 @@ if ( ! class_exists( 'rtWLSShortCode' ) ) :
 			$cCss     = ! empty( $settings['custom_css'] ) ? trim( $settings['custom_css'] ) : null;
 
 			if ( $cCss ) {
-				$css .= wp_strip_all_tags( $cCss );
+				// Sanitize again on output in case a legacy value was stored before tighter sanitization landed.
+				$css .= $rtWLS->sanitize_custom_css( $cCss );
 			}
 
 			$css .= '</style>';

@@ -6,7 +6,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-25 05:41+0000\n"
+"POT-Creation-Date: 2026-05-20 08:43+0000\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -14,35 +14,35 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../lib/controllers/rtWLSAjaxResponse.php:62
+#: ../lib/controllers/rtWLSAjaxResponse.php:61
 msgid "Security Error !!"
 msgstr ""
 
-#: ../lib/controllers/rtWLSAjaxResponse.php:59
+#: ../lib/controllers/rtWLSAjaxResponse.php:58
 msgid "Settings successfully updated"
 msgstr ""
 
-#: ../lib/controllers/rtWLSAjaxResponse.php:108
+#: ../lib/controllers/rtWLSAjaxResponse.php:109
 msgid "No shortcode found."
 msgstr ""
 
-#: ../lib/controllers/rtWLSAjaxResponse.php:97
+#: ../lib/controllers/rtWLSAjaxResponse.php:98
 msgid "Select Short code"
 msgstr ""
 
-#: ../lib/controllers/rtWLSAjaxResponse.php:99
+#: ../lib/controllers/rtWLSAjaxResponse.php:100
 msgid "Default"
 msgstr ""
 
-#: ../lib/controllers/rtWLSHelper.php:135
+#: ../lib/controllers/rtWLSHelper.php:136
 msgid "Soft Crop"
 msgstr ""
 
-#: ../lib/controllers/rtWLSHelper.php:136
+#: ../lib/controllers/rtWLSHelper.php:137
 msgid "Hard Crop"
 msgstr ""
 
-#: ../lib/controllers/rtWLSHelper.php:341
+#: ../lib/controllers/rtWLSHelper.php:411
 msgid "Select One"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgstr ""
 msgid "Demo"
 msgstr ""
 
-#: ../lib/controllers/rtWLSInit.php:45, ../lib/controllers/rtWLSSCMeta.php:176, ../lib/controllers/rtWLSSCMeta.php:258, ../lib/views/settings.php:21
+#: ../lib/controllers/rtWLSInit.php:45, ../lib/controllers/rtWLSSCMeta.php:183, ../lib/controllers/rtWLSSCMeta.php:265, ../lib/views/settings.php:29
 msgid "Documentation"
 msgstr ""
 
@@ -202,11 +202,15 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: ../lib/controllers/rtWLSMeta.php:53, ../lib/controllers/rtWLSMeta.php:95
+#: ../lib/controllers/rtWLSMeta.php:53, ../lib/controllers/rtWLSMeta.php:89
 msgid "Logo Image"
 msgstr ""
 
-#: ../lib/controllers/rtWLSMeta.php:160
+#: ../lib/controllers/rtWLSMeta.php:71
+msgid "No logo added."
+msgstr ""
+
+#: ../lib/controllers/rtWLSMeta.php:154
 msgid "Logo Information"
 msgstr ""
 
@@ -322,7 +326,7 @@ msgstr ""
 msgid "Order"
 msgstr ""
 
-#: ../lib/controllers/rtWLSOptions.php:269, ../lib/controllers/rtWLSSCMeta.php:223
+#: ../lib/controllers/rtWLSOptions.php:269, ../lib/controllers/rtWLSSCMeta.php:230
 msgid "Layout"
 msgstr ""
 
@@ -410,7 +414,7 @@ msgstr ""
 msgid "No link"
 msgstr ""
 
-#: ../lib/controllers/rtWLSOptions.php:418, ../lib/controllers/rtWLSSCMeta.php:225
+#: ../lib/controllers/rtWLSOptions.php:418, ../lib/controllers/rtWLSSCMeta.php:232
 msgid "Field Selection"
 msgstr ""
 
@@ -462,27 +466,27 @@ msgstr ""
 msgid "Alt for url and image"
 msgstr ""
 
-#: ../lib/controllers/rtWLSSCMeta.php:167
+#: ../lib/controllers/rtWLSSCMeta.php:174
 msgid "Short Code Generator"
 msgstr ""
 
-#: ../lib/controllers/rtWLSSCMeta.php:224
+#: ../lib/controllers/rtWLSSCMeta.php:231
 msgid "Filtering"
 msgstr ""
 
-#: ../lib/controllers/rtWLSSCMeta.php:226
+#: ../lib/controllers/rtWLSSCMeta.php:233
 msgid "Styling"
 msgstr ""
 
-#: ../lib/controllers/rtWLSSCMeta.php:259
+#: ../lib/controllers/rtWLSSCMeta.php:266
 msgid "Get started by spending some time with the documentation we included step by step process with screenshots with video."
 msgstr ""
 
-#: ../lib/controllers/rtWLSShortCode.php:272
+#: ../lib/controllers/rtWLSShortCode.php:284
 msgid "No short code found"
 msgstr ""
 
-#: ../lib/controllers/rtWLSShortCode.php:269
+#: ../lib/controllers/rtWLSShortCode.php:281
 msgid "No logo found"
 msgstr ""
 
@@ -498,19 +502,19 @@ msgstr ""
 msgid "Please select a post grid"
 msgstr ""
 
-#: ../lib/views/settings.php:14
+#: ../lib/views/settings.php:22
 msgid "WP Logo Showcase Settings"
 msgstr ""
 
-#: ../lib/views/settings.php:18
+#: ../lib/views/settings.php:26
 msgid "General settings"
 msgstr ""
 
-#: ../lib/views/settings.php:30
+#: ../lib/views/settings.php:38
 msgid "General Settings"
 msgstr ""
 
-#: ../lib/views/settings.php:34
+#: ../lib/views/settings.php:42
 msgid "Custom CSS"
 msgstr ""
 
@@ -518,14 +522,14 @@ msgstr ""
 msgid "Display the Logo showcase."
 msgstr ""
 
-#: ../lib/widgets/rtWLSWidget.php:27, ../lib/widgets/rtWLSWidget.php:56
+#: ../lib/widgets/rtWLSWidget.php:27, ../lib/widgets/rtWLSWidget.php:64
 msgid "WP Logo Showcase"
 msgstr ""
 
-#: ../lib/widgets/rtWLSWidget.php:62
+#: ../lib/widgets/rtWLSWidget.php:70
 msgid "Title:"
 msgstr ""
 
-#: ../lib/widgets/rtWLSWidget.php:64
+#: ../lib/widgets/rtWLSWidget.php:72
 msgid "Select Shortcode:"
 msgstr ""

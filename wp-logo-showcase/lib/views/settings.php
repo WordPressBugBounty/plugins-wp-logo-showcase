@@ -5,6 +5,14 @@
  * @package RT_WSL
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! current_user_can( 'manage_options' ) ) {
+	return;
+}
+
 global $rtWLS;
 
 $doc = 'https://www.radiustheme.com/setup-wp-logo-showcase-free-version-wordpress/';
@@ -49,7 +57,7 @@ $doc = 'https://www.radiustheme.com/setup-wp-logo-showcase-free-version-wordpres
 							id="rtSaveButton"
 							value="Save Changes">
 				</p>
-				<?php wp_nonce_field( $rtWLS->nonceText(), $rtWLS->nonceId() ); ?>
+				<?php wp_nonce_field( $rtWLS->nonceText( 'settings_save' ), $rtWLS->nonceId() ); ?>
 			</form>
 			<div class="rt-response"></div>
 		</div>

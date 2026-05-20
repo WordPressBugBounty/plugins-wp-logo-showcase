@@ -55,19 +55,59 @@ if ( ! class_exists( 'rtWLS' ) ) {
 		}
 
 		/**
+		 * Bundled plugin file expected under each lib subdirectory.
+		 * Only files whose basename appears here are loaded — guards against
+		 * an attacker dropping a stray .php file in lib/ via a separate vuln.
+		 */
+		private function trustedClassNames( $type ) {
+			switch ( $type ) {
+				case 'model':
+					return [ 'rtWLSField', 'rtWLSReSizer' ];
+				case 'controller':
+					return [
+						'rtWLSAjaxResponse',
+						'rtWLSHelper',
+						'rtWLSInit',
+						'rtWLSMeta',
+						'rtWLSOptions',
+						'rtWLSSCButton',
+						'rtWLSSCMeta',
+						'rtWLSSElementor',
+						'rtWLSSGutenBurg',
+						'rtWLSShortCode',
+					];
+				case 'widget':
+					return [ 'rtWLSWidget' ];
+			}
+			return [];
+		}
+
+		/**
+		 * Require a plugin file by class name, only if it is on the allowlist
+		 * and lives directly inside the given trusted directory.
+		 */
+		private function requireTrusted( $dir, $className ) {
+			$file = $dir . $className . '.php';
+			$real = realpath( $file );
+			$base = realpath( $dir );
+			if ( ! $real || ! $base || strpos( $real, $base ) !== 0 ) {
+				return false;
+			}
+			require_once $real;
+			return class_exists( $className );
+		}
+
+		/**
 		 * Load Model class
 		 *
 		 * @param $dir
 		 */
 		public function rtLoadModel( $dir ) {
-			if ( ! file_exists( $dir ) ) {
+			if ( ! is_dir( $dir ) ) {
 				return;
 			}
-
-			foreach ( scandir( $dir ) as $item ) {
-				if ( preg_match( '/.php$/i', $item ) ) {
-					require_once $dir . $item;
-				}
+			foreach ( $this->trustedClassNames( 'model' ) as $className ) {
+				$this->requireTrusted( $dir, $className );
 			}
 		}
 
@@ -77,23 +117,13 @@ if ( ! class_exists( 'rtWLS' ) ) {
 		 * @param $dir
 		 */
 		public function rtLoadController( $dir ) {
-			if ( ! file_exists( $dir ) ) {
+			if ( ! is_dir( $dir ) ) {
 				return;
 			}
 
-			$classes = [];
-
-			foreach ( scandir( $dir ) as $item ) {
-				if ( preg_match( '/.php$/i', $item ) ) {
-					require_once $dir . $item;
-					$className = str_replace( '.php', '', $item );
-					$classes[] = new $className();
-				}
-			}
-
-			if ( $classes ) {
-				foreach ( $classes as $class ) {
-					$this->objects[] = $class;
+			foreach ( $this->trustedClassNames( 'controller' ) as $className ) {
+				if ( $this->requireTrusted( $dir, $className ) ) {
+					$this->objects[] = new $className();
 				}
 			}
 		}
@@ -104,21 +134,20 @@ if ( ! class_exists( 'rtWLS' ) ) {
 		 * @param $dir
 		 */
 		public function loadWidget( $dir ) {
-			if ( ! file_exists( $dir ) ) {
+			if ( ! is_dir( $dir ) ) {
 				return;
 			}
 
-			foreach ( scandir( $dir ) as $item ) {
-				if ( preg_match( '/.php$/i', $item ) ) {
-					require_once $dir . $item;
-					$class = str_replace( '.php', '', $item );
+			foreach ( $this->trustedClassNames( 'widget' ) as $className ) {
+				if ( ! $this->requireTrusted( $dir, $className ) ) {
+					continue;
+				}
 
-					if ( method_exists( $class, 'register_widget' ) ) {
-						$caller = new $class();
-						$caller->register_widget();
-					} else {
-						register_widget( $class );
-					}
+				if ( method_exists( $className, 'register_widget' ) ) {
+					$caller = new $className();
+					$caller->register_widget();
+				} else {
+					register_widget( $className );
 				}
 			}
 		}
@@ -129,52 +158,57 @@ if ( ! class_exists( 'rtWLS' ) ) {
 			$path     = str_replace( '.', '/', $viewName );
 			$viewPath = $rtWLS->viewsPath . $path . '.php';
 
-			if ( ! file_exists( $viewPath ) ) {
+			// Refuse path traversal — viewName must resolve under viewsPath.
+			$realViewPath = realpath( $viewPath );
+			$realViewsDir = realpath( $rtWLS->viewsPath );
+			if ( ! $realViewPath || ! $realViewsDir || strpos( $realViewPath, $realViewsDir ) !== 0 ) {
 				return;
 			}
 
-			if ( $args ) {
-				extract( $args );
+			if ( ! file_exists( $realViewPath ) ) {
+				return;
+			}
+
+			if ( is_array( $args ) && $args ) {
+				// EXTR_SKIP keeps existing locals (e.g. $rtWLS, $viewPath) safe from shadowing.
+				extract( $args, EXTR_SKIP );
 			}
 
 			if ( $return ) {
 				ob_start();
-				include $viewPath;
+				include $realViewPath;
 				return ob_get_clean();
 			}
 
-			include $viewPath;
+			include $realViewPath;
 		}
 
 
 		/**
-		 * Dynamically call any  method from models class
-		 * by pluginFramework instance
+		 * Dynamically call any method from loaded controller/model classes
+		 * via the pluginFramework instance.
+		 *
+		 * Refuses PHP magic methods and any name that is not a plain
+		 * identifier, so even if a future caller passes user input as the
+		 * method name the dispatcher cannot invoke __construct/__destruct
+		 * or other unintended internals.
 		 */
 		public function __call( $name, $args ) {
 			if ( ! is_array( $this->objects ) ) {
 				return;
 			}
 
-			foreach ( $this->objects as $object ) {
-				if ( method_exists( $object, $name ) ) {
-					$count = count( $args );
+			if ( ! is_string( $name ) || ! preg_match( '/^[A-Za-z_][A-Za-z0-9_]*$/', $name ) ) {
+				return;
+			}
 
-					if ( $count == 0 ) {
-						return $object->$name();
-					} elseif ( $count == 1 ) {
-						return $object->$name( $args[0] );
-					} elseif ( $count == 2 ) {
-						return $object->$name( $args[0], $args[1] );
-					} elseif ( $count == 3 ) {
-						return $object->$name( $args[0], $args[1], $args[2] );
-					} elseif ( $count == 4 ) {
-						return $object->$name( $args[0], $args[1], $args[2], $args[3] );
-					} elseif ( $count == 5 ) {
-						return $object->$name( $args[0], $args[1], $args[2], $args[3], $args[4] );
-					} elseif ( $count == 6 ) {
-						return $object->$name( $args[0], $args[1], $args[2], $args[3], $args[4], $args[5] );
-					}
+			if ( 0 === strncmp( $name, '__', 2 ) ) {
+				return;
+			}
+
+			foreach ( $this->objects as $object ) {
+				if ( method_exists( $object, $name ) && is_callable( [ $object, $name ] ) ) {
+					return call_user_func_array( [ $object, $name ], $args );
 				}
 			}
 		}

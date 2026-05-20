@@ -32,20 +32,28 @@ if ( ! class_exists( 'rtWLSWidget' ) ) :
 		 * Display the widgets on the screen.
 		 */
 		public function widget( $args, $instance ) {
-			extract( $args );
+			$before_widget = isset( $args['before_widget'] ) ? $args['before_widget'] : '';
+			$after_widget  = isset( $args['after_widget'] ) ? $args['after_widget'] : '';
+			$before_title  = isset( $args['before_title'] ) ? $args['before_title'] : '';
+			$after_title   = isset( $args['after_title'] ) ? $args['after_title'] : '';
 
-			$id = ( ! empty( $instance['id'] ) ? $instance['id'] : null );
-			echo $before_widget; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$id = ( ! empty( $instance['id'] ) ? absint( $instance['id'] ) : 0 );
+
+			// $before_widget / $after_widget come from the theme's register_sidebar() — trusted.
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo $before_widget;
 
 			if ( ! empty( $instance['title'] ) ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+				$title = apply_filters( 'widget_title', $instance['title'] );
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- theme-provided wrappers.
+				echo $before_title . esc_html( $title ) . $after_title;
 			}
 
 			if ( $id ) {
-				echo do_shortcode( '[logo-showcase id="' . absint( $id ) . '"]' );
+				echo do_shortcode( '[logo-showcase id="' . $id . '"]' );
 			}
-            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			echo $after_widget;
 		}
 
@@ -60,7 +68,7 @@ if ( ! class_exists( 'rtWLSWidget' ) ) :
 
 			?>
 			<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'wp-logo-showcase' ); ?></label>
-				<input type="text" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" value="<?php echo esc_html( $instance['title'] ); ?>" style="width:100%;" /></p>
+				<input type="text" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" value="<?php echo esc_attr( $instance['title'] ); ?>" style="width:100%;" /></p>
 			<p><label for="<?php echo esc_attr( $this->get_field_id( 'id' ) ); ?>"><?php esc_html_e( 'Select Shortcode:', 'wp-logo-showcase' ); ?></label>
 				<select name="<?php echo esc_attr( $this->get_field_name( 'id' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'id' ) ); ?>">
 					<option value=''>Select One</option>

@@ -27,20 +27,19 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 			global $rtWLS;
 			$msg   = null;
 			$error = true;
-			if ( wp_verify_nonce($rtWLS->getNonce(),$rtWLS->nonceText()) && current_user_can( 'manage_options' ) ) {
-				unset( $_REQUEST['action'] );
-				unset( $_REQUEST[ $rtWLS->nonceId() ] );
-				unset( $_REQUEST['_wp_http_referer'] );
+			if ( 'POST' === ( isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) ) : '' )
+				&& wp_verify_nonce( $rtWLS->getNonce(), $rtWLS->nonceText( 'settings_save' ) )
+				&& current_user_can( 'manage_options' ) ) {
 
 				$value  = [];
 				$fields = $rtWLS->allSettingsFields();
 
 				foreach ( $fields as $field ) {
 					$type   = ! empty( $field['type'] ) ? $field['type'] : '';
-					$rValue = ( ! empty( $_REQUEST[ $field['name'] ] ) ? wp_unslash( $_REQUEST[ $field['name'] ] ) : null );
+					$rValue = ( ! empty( $_POST[ $field['name'] ] ) ? wp_unslash( $_POST[ $field['name'] ] ) : null );
 
 					if ( $type == 'custom_css' ) {
-						$value[ $field['name'] ] = wp_filter_nohtml_kses( $rValue );
+						$value[ $field['name'] ] = $rtWLS->sanitize_custom_css( $rValue );
 					} elseif ( $type == 'text' || $type == 'number' || $type == 'select' || $type == 'checkbox' || $type == 'radio' ) {
 						$value[ $field['name'] ] = sanitize_text_field( $rValue );
 					} elseif ( $type == 'url' ) {
@@ -80,6 +79,8 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 				wp_die();
 			}
 
+			check_ajax_referer( $rtWLS->nonceText( 'sc_list' ), $rtWLS->nonceId() );
+
 			$html = null;
 			$scQ  = new WP_Query(
 				[
@@ -94,7 +95,7 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 			if ( $scQ->have_posts() ) {
 				$html .= "<div class='mce-container mce-form'>";
 				$html .= "<div class='mce-container-body'>";
-				$html .= '<label class="mce-widget mce-label" style="padding: 20px;font-weight: bold;" for="scid">' . __( 'Select Short code', 'wp-logo-showcase' ) . '</label>';
+				$html .= '<label class="mce-widget mce-label" style="padding: 20px;font-weight: bold;" for="scid">' . esc_html__( 'Select Short code', 'wp-logo-showcase' ) . '</label>';
 				$html .= "<select name='id' id='scid' style='width: 150px;margin: 15px;'>";
 				$html .= "<option value=''>" . esc_html__( 'Default', 'wp-logo-showcase' ) . '</option>';
 				while ( $scQ->have_posts() ) {

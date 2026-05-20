@@ -303,13 +303,17 @@ if ( ! class_exists( 'rtWLSInit' ) ) :
 
 		/**
 		 *    Insert some default data on plugin activation
+		 *
+		 * Only seeds defaults on first activation — re-activations (and
+		 * silent re-runs after auto-update) must not wipe the admin's
+		 * saved settings.
 		 */
 		private function insertDefaultData() {
 			global $rtWLS;
 
 			update_option( $rtWLS->options['installed_version'], $rtWLS->options['version'] );
 
-			if ( get_option( $rtWLS->options['settings'] ) ) {
+			if ( false === get_option( $rtWLS->options['settings'], false ) ) {
 				update_option( $rtWLS->options['settings'], $rtWLS->defaultSettings );
 			}
 		}

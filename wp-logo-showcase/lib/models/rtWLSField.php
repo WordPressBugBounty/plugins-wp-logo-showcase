@@ -84,11 +84,21 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 		public function Field( $attr ) {
 			$this->setArgument( $attr );
 			$html  = null;
-			$html  = null;
 			$html .= "<div class='rt-field-wrapper " . esc_attr( $this->holderClass ) . "' id='" . esc_attr( $this->holderID ) . "'>";
+			// Labels are plugin-defined strings — some embed intentional markup like
+			// "<span style='color:red;'>Pro</span>". Restrict to a small allowlist so
+			// translators (or future callers) cannot inject script.
+			$labelAllowed = [
+				'span'   => [ 'style' => true, 'class' => true ],
+				'strong' => [],
+				'em'     => [],
+				'b'      => [],
+				'i'      => [],
+				'br'     => [],
+			];
 			$html .= sprintf(
 				'<div class="rt-label">%s</div>',
-				$this->label ? sprintf( '<label for="">%s</label>', $this->label ) : ''
+				$this->label ? sprintf( '<label for="">%s</label>', wp_kses( $this->label, $labelAllowed ) ) : ''
 			);
 			$html .= "<div class='rt-field'>";
 			switch ( $this->type ) {
@@ -249,24 +259,24 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 		 * @return null|string
 		 */
 		private function select() {
-			$h = null;
+			$h         = null;
+			$multiAttr = '';
 			if ( $this->multiple ) {
-				$this->attr  = " style='min-width:160px;'";
 				$this->name  = $this->name . '[]';
-				$this->attr  = $this->attr . " multiple='multiple'";
+				$multiAttr   = " multiple='multiple' style='min-width:160px;'";
 				$this->value = ( is_array( $this->value ) && ! empty( $this->value ) ? $this->value : [] );
 			} else {
 				$this->value = [ $this->value ];
 			}
 
-			$h .= "<select name='" . esc_attr( $this->name ) . "' id='" . esc_attr( $this->id ) . "' class='" . esc_attr( $this->class ) . "'>";
+			$h .= "<select name='" . esc_attr( $this->name ) . "' id='" . esc_attr( $this->id ) . "' class='" . esc_attr( $this->class ) . "'{$multiAttr}>";
 			if ( $this->blank ) {
 				$h .= "<option value=''>" . esc_html( $this->blank ) . '</option>';
 			}
 			if ( is_array( $this->options ) && ! empty( $this->options ) ) {
 				foreach ( $this->options as $key => $value ) {
-					$slt = ( in_array( $key, $this->value ) ? 'selected' : null );
-					$h  .= "<option {$slt} value='" . esc_attr( $key ) . "'>" . esc_html( $value ) . "</option>";
+					$slt = ( in_array( $key, $this->value ) ? "selected='selected'" : '' );
+					$h  .= "<option {$slt} value='" . esc_attr( $key ) . "'>" . esc_html( $value ) . '</option>';
 				}
 			}
 			$h .= '</select>';
@@ -369,8 +379,8 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 			$h       .= "<select name='" . esc_attr( $this->name ) . "[crop]' class='rt-select2'>";
 			$cropList = $rtWLS->imageCropType();
 			foreach ( $cropList as $crop => $cropLabel ) {
-				$cSl = ( $crop == $cropV ? 'selected' : null );
-				$h  .= "<option value='".esc_attr( $crop )."' {$cSl}>{$cropLabel}</option>";
+				$cSl = ( $crop == $cropV ? 'selected' : '' );
+				$h  .= "<option value='" . esc_attr( $crop ) . "' " . esc_attr( $cSl ) . '>' . esc_html( $cropLabel ) . '</option>';
 			}
 			$h .= '</select>';
 			$h .= '</div>';

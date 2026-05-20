@@ -47,12 +47,13 @@
         });
 
         function putScList(){
-            var dialogBody = jQuery( '#wls-sc-dialog-body' )
-            jQuery.post( ajaxurl, {
-                action: 'wlsShortCodeList'
-            }, function( response ) {
+            var dialogBody = jQuery( '#wls-sc-dialog-body' );
+            var payload    = { action: 'wlsShortCodeList' };
+            if ( window.wlsSCButton && window.wlsSCButton.nonceID && window.wlsSCButton.nonce ) {
+                payload[ window.wlsSCButton.nonceID ] = window.wlsSCButton.nonce;
+            }
+            jQuery.post( ajaxurl, payload, function( response ) {
                 dialogBody.html(response);
-                console.log(response);
             });
         }
 

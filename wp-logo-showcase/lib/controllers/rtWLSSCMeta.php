@@ -92,18 +92,25 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 		public function remove_all_meta_boxes_wls_sc() {
 			global $wp_meta_boxes, $rtWLS;
 
-			$publishBox                           = $wp_meta_boxes[ $rtWLS->shortCodePT ]['side']['core']['submitdiv'];
-			$scBox                                = $wp_meta_boxes[ $rtWLS->shortCodePT ]['normal']['high'][ $rtWLS->shortCodePT . '_sc_settings_meta' ];
-			$docBox                               = $wp_meta_boxes[ $rtWLS->shortCodePT ]['side']['low']['rt_plugin_sc_pro_information'];
-			$wp_meta_boxes[ $rtWLS->shortCodePT ] = [
+			$cpt        = $rtWLS->shortCodePT;
+			$scBoxKey   = $cpt . '_sc_settings_meta';
+			$publishBox = isset( $wp_meta_boxes[ $cpt ]['side']['core']['submitdiv'] )
+				? $wp_meta_boxes[ $cpt ]['side']['core']['submitdiv']
+				: null;
+			$scBox      = isset( $wp_meta_boxes[ $cpt ]['normal']['high'][ $scBoxKey ] )
+				? $wp_meta_boxes[ $cpt ]['normal']['high'][ $scBoxKey ]
+				: null;
+			$docBox     = isset( $wp_meta_boxes[ $cpt ]['side']['low']['rt_plugin_sc_pro_information'] )
+				? $wp_meta_boxes[ $cpt ]['side']['low']['rt_plugin_sc_pro_information']
+				: null;
+
+			$wp_meta_boxes[ $cpt ] = [
 				'side'   => [
-					'core' => [ 'submitdiv' => $publishBox ],
-					'low'  => [ 'rt_plugin_sc_pro_information' => $docBox ],
+					'core' => $publishBox ? [ 'submitdiv' => $publishBox ] : [],
+					'low'  => $docBox ? [ 'rt_plugin_sc_pro_information' => $docBox ] : [],
 				],
 				'normal' => [
-					'high' => [
-						$rtWLS->shortCodePT . '_sc_settings_meta' => $scBox,
-					],
+					'high' => $scBox ? [ $scBoxKey => $scBox ] : [],
 				],
 			];
 
@@ -145,13 +152,13 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 				]
 			);
 
-			$nonce = wp_create_nonce( $rtWLS->nonceText() );
+			$nonce = wp_create_nonce( $rtWLS->nonceText( 'sc_save' ) );
 
 			wp_localize_script(
 				'rt-wls-admin',
 				'wls',
 				[
-					'nonceID' => esc_attr( $rtWLS->nonceID() ),
+					'nonceID' => esc_attr( $rtWLS->nonceId() ),
 					'nonce'   => esc_attr( $nonce ),
 					'ajaxurl' => esc_url( admin_url( 'admin-ajax.php' ) ),
 				]
@@ -215,7 +222,7 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 		public function wls_sc_settings_selection( $post ) {
 			global $rtWLS;
 
-			wp_nonce_field( $rtWLS->nonceText(), $rtWLS->nonceID() );
+			wp_nonce_field( $rtWLS->nonceText( 'sc_save' ), $rtWLS->nonceId() );
 
 			$html  = null;
 			$html .= '<div class="rt-tab-container">';
@@ -296,7 +303,12 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 
 			global $rtWLS;
 
-			if ( ! wp_verify_nonce($rtWLS->getNonce(),$rtWLS->nonceText()) ) {
+			// Only act on our shortcode post type.
+			if ( ! isset( $post->post_type ) || $rtWLS->shortCodePT !== $post->post_type ) {
+				return $post_id;
+			}
+
+			if ( ! $rtWLS->verifyNonce( 'sc_save' ) ) {
 				return $post_id;
 			}
 
@@ -304,14 +316,10 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 				return $post_id;
 			}
 
-			if ( $rtWLS->shortCodePT != $post->post_type ) {
-				return $post_id;
-			}
-
 			$mates = $rtWLS->wlsScMetaNames();
 
 			foreach ( $mates as $field ) {
-				$rValue = ! empty( $_REQUEST[ $field['name'] ] ) ? wp_unslash( $_REQUEST[ $field['name'] ] ) : null;
+				$rValue = ! empty( $_POST[ $field['name'] ] ) ? wp_unslash( $_POST[ $field['name'] ] ) : null;
 				$value  = $rtWLS->sanitize( $field, $rValue );
 
 				if ( empty( $field['multiple'] ) ) {
