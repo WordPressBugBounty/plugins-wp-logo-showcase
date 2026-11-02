@@ -5,6 +5,22 @@
 /********************** support@radiustheme.com ************************/
 /******************* (c) 2016 by radiustheme.com ***********************/
 /**********************************************************************/
+
+:root {
+    --rt-primary-color: #004BFF;
+    --rt-secondary-color: #013bc5;
+    --rt-body-bg-color: #ffffff;
+    --rt-body-color: #343C4D;
+    --rt-border-color: #e7e7e7;
+    --rt-title-color: #00030C;
+    --rt-white-color: #ffffff;
+    --rt-rating-color: #F9BA19;
+    --rt-button-color: #ffffff;
+    --rt-button-text-color: #00030C;
+    --rt-meta-color: #7F838C;
+    --rt-meta-light: #d3d9e1;
+}
+
 .rt-container * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -34,7 +50,7 @@
     display: -ms-flexbox;
     display: flex;
     -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 .rt-container-container ul {
@@ -183,11 +199,18 @@
     display: block;
 }
 .rt-wpls .single-logo h3 {
-    margin: 5px 0 10px;
+    margin: 15px 0 10px;
     line-height: 1.3;
-    font-size: 25px;
+    font-size: 20px;
 }
-
+.rt-wpls .single-logo h3,
+.rt-wpls .single-logo h3 a{
+    color: var(--rt-title-color);
+    transition: 0.4s;
+}
+.rt-wpls .single-logo h3 a:hover{
+    color: var(--rt-primary-color);
+}
 .rt-wpls .single-logo a {
     box-shadow: none;
     font-size: inherit;
@@ -202,11 +225,15 @@
     text-align: center;
     vertical-align: middle;
     position: relative;
-    margin: 0px;
     width: 100%;
+    background: rgb(255, 255, 255);
+    border: 1px solid rgb(236, 236, 240);
+    border-radius: 22px;
+    padding: 30px 24px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
+    margin: 0 0 30px;
 }
 .rt-wpls .single-logo img {
-    padding: 10px;
     max-width: 100%;
     height: auto;
     display: inline-block;
@@ -220,7 +247,16 @@ body.wls_ie .rt-wpls .single-logo img {
     text-align: center;
     display: table-cell;
     vertical-align: middle;
-    padding: 10px;
+    margin-top: 15px;
+}
+.rt-wpls .single-logo .single-logo-container img{
+    display: inline-block;
+}
+.rt-wpls .single-logo .single-logo-container p{
+    margin: 0;
+}
+.rt-wpls .single-logo .single-logo-container .logo-description{
+    margin: 15px 0 0;
 }
 .single-logo-container> * {
     text-align: center;
@@ -235,6 +271,14 @@ body.wls_ie .rt-wpls .single-logo img {
     .single-logo-container> *{
         display: inline-block;
     }
+}
+.rt-wpls:has(.carousel-layout) .single-logo{
+    margin: 0;
+}
+.rt-wpls:not(:has(.carousel-layout)) .single-logo:hover {
+    border-color: color-mix(in srgb, var(--rt-primary-color) 40%, transparent);
+    box-shadow: 0 22px 44px -16px color-mix(in srgb, var(--rt-primary-color) 32%, transparent);
+    transform: translateY(-6px);
 }
 /**********************************************************************/
 /**************************** slick Carousel  *************************/
@@ -329,6 +373,21 @@ body.wls_ie .rt-wpls .single-logo img {
 .rt-wpls .slick-loading .slick-list {
     background: #fff url('../images/ajax-loader.gif') center center no-repeat;
 }
+.rt-wpls .carousel-layout{
+    background: rgb(255, 255, 255);
+    border: 1px solid rgb(236, 236, 240);
+    border-radius: 24px;
+    padding: 44px 64px;
+    position: relative;
+    margin-left: 0;
+    margin-right: 0;
+}
+.rt-wpls .carousel-layout .single-logo{
+    border-color: transparent;
+}
+.rt-wpls .carousel-layout .single-logo:hover{
+    border-color: var(--rt-primary-color);
+}
 /***************************** Icons *****************/
 @font-face
 {
@@ -343,31 +402,37 @@ body.wls_ie .rt-wpls .single-logo img {
 .rt-wpls .slick-prev,
 .rt-wpls .slick-next {
     font-size: 0;
-    line-height: 0;
     position: absolute;
     top: 50%;
     display: block;
-    width: 29px;
-    height: 29px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
     z-index: 99;
-    padding: 0;
     -webkit-transform: translate(0, -50%);
     -ms-transform: translate(0, -50%);
     transform: translate(0, -50%);
     cursor: pointer;
-    color: #8e8d8d;
-    border: none;
     outline: none;
-    background: #8e8d8d;
+    background: #fff;
     border-radius: 50%;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
+    padding: 0;
+    border: 1px solid #ccc;
+    color: var(--rt-title-color);
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 6px 16px -6px;
+    transition: 0.3s;
+    /* Browsers mirror ‹ and › in right-to-left text: keep the glyph as the
+       rules below set it, so each arrow points to its own side. */
+    direction: ltr;
 }
 .rt-wpls .slick-prev:hover,
 .rt-wpls .slick-prev:focus,
 .rt-wpls .slick-next:hover,
 .rt-wpls .slick-next:focus {
     outline: none;
+    border-color: var(--rt-primary-color);
+    background-color: var(--rt-primary-color);
 }
 .rt-wpls .slick-prev:hover:before,
 .rt-wpls .slick-prev:focus:before,
@@ -384,53 +449,104 @@ body.wls_ie .rt-wpls .single-logo img {
 .rt-wpls .slick-next:before {
     font-family: 'slick';
     font-size: 28px;
-    line-height: 0;
-    height: 30px;
     opacity: .75;
-    color: #ffffff;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    border-radius: 50%;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--rt-title-color);
+    line-height: normal;
+    transition: 0.3s;
 }
-
+.rt-wpls .slick-prev:focus:before,
+.rt-wpls .slick-prev:hover:before,
+.rt-wpls .slick-next:focus:before,
+.rt-wpls .slick-next:hover:before {
+    color: var(--rt-white-color);
+}
 .rt-wpls .slick-prev{
-    left: 0;
-}
-[dir='rtl'] .slick-prev {
-    right: 0;
-    left: auto;
+    left: 15px;
 }
 .rt-wpls .slick-prev:before{
-    content: '←';
-}
-[dir='rtl'] .slick-prev:before {
-    content: '→';
+    content: '‹';
 }
 .rt-wpls .slick-next{
     right: 15px;
 }
-[dir='rtl'] .slick-next {
+.rt-wpls .slick-next:before {
+    content: '›';
+}
+
+/*
+ * Right to left: the slider's "Right to Left" option puts dir="rtl" on the
+ * slider itself, an RTL site puts it on <html>. Previous moves to the right
+ * and Next to the left, at the same 15px as in LTR, each arrow pointing to
+ * its own side. Scoped to .rt-wpls so other sliders on the page are untouched.
+ */
+.rt-wpls [dir='rtl'] .slick-prev,
+[dir='rtl'] .rt-wpls .slick-prev {
+    right: 15px;
+    left: auto;
+}
+.rt-wpls [dir='rtl'] .slick-prev:before,
+[dir='rtl'] .rt-wpls .slick-prev:before {
+    content: '›';
+}
+.rt-wpls [dir='rtl'] .slick-next,
+[dir='rtl'] .rt-wpls .slick-next {
     right: auto;
     left: 15px;
 }
-.rt-wpls .slick-next:before {
-    content: '→';
+.rt-wpls [dir='rtl'] .slick-next:before,
+[dir='rtl'] .rt-wpls .slick-next:before {
+    content: '‹';
 }
-[dir='rtl'] .slick-next:before {
-    content: '←';
+
+/*
+ * Phones: the slider's 64px side padding, the 15px slide padding and the logo
+ * card's own padding left no room for the logos, which shrank to nothing.
+ * Tighter spacing and smaller arrows below 768px. A shortcode's Custom CSS or
+ * Elementor style settings still override these.
+ */
+@media (max-width: 767px) {
+    .rt-wpls .carousel-layout {
+        padding: 28px 44px;
+    }
+    .rt-wpls .carousel-layout .slick-slide {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    .rt-wpls .carousel-layout .single-logo {
+        padding: 12px 8px;
+    }
+    .rt-wpls .slick-prev,
+    .rt-wpls .slick-next {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+    }
+    .rt-wpls .slick-prev:before,
+    .rt-wpls .slick-next:before {
+        font-size: 22px;
+    }
+    .rt-wpls .slick-prev {
+        left: 6px;
+    }
+    .rt-wpls .slick-next {
+        right: 6px;
+    }
+    .rt-wpls [dir='rtl'] .slick-prev,
+    [dir='rtl'] .rt-wpls .slick-prev {
+        right: 6px;
+        left: auto;
+    }
+    .rt-wpls [dir='rtl'] .slick-next,
+    [dir='rtl'] .rt-wpls .slick-next {
+        right: auto;
+        left: 6px;
+    }
 }
 /******************************* Dots ***********************/
 .rt-wpls .slick-dotted.slick-slider {
     margin-bottom: 30px;
 }
 .rt-wpls .slick-dots {
-    position: absolute;
-    bottom: -25px;
     display: block;
     width: 100%;
     padding: 0;
@@ -441,52 +557,28 @@ body.wls_ie .rt-wpls .single-logo img {
 .rt-wpls .slick-dots li {
     position: relative;
     display: inline-block;
-    width: 15px;
-    height: 15px;
-    margin: 0 5px;
     padding: 0;
+    margin: 0 4px;
     cursor: pointer;
 }
 .rt-wpls .slick-dots li button{
     font-size: 0;
     line-height: 0;
     display: block;
-    width: 20px;
-    height: 20px;
-    padding: 5px;
     cursor: pointer;
     color: transparent;
     border: 0;
     outline: none;
-    background: transparent;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgb(214, 214, 222);
+    padding: 0;
+    transition: 0.3s;
 }
-.rt-wpls .slick-dots li button:hover,
-.rt-wpls .slick-dots li button:focus {
-    outline: none;
-}
-.rt-wpls .slick-dots li button:hover:before,
-.rt-wpls .slick-dots li button:focus:before {
-    opacity: 1;
-}
-.rt-wpls .slick-dots li button:before {
-    font-family: 'slick';
-    font-size: 12px;
-    line-height: 15px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 20px;
-    content: '•';
-    text-align: center;
-    opacity: .5;
-    color: black;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-.rt-wpls .slick-dots li.slick-active button:before {
-    opacity: 1;
-    color: black;
+.rt-wpls .slick-dots li.slick-active button{
+    background: var(--rt-primary-color);
+    width: 22px;
 }
 /*************************** Tool Tip ****************/
 body> .rt-tooltip {
@@ -535,6 +627,7 @@ body> .rt-tooltip .rt-tooltip-bottom:after {
     -ms-transform: rotate(45deg);
     tranform: rotate(45deg);
 }
+
 /**********************************************************************/
 /********************************* Media Query *************************/
 /**********************************************************************/

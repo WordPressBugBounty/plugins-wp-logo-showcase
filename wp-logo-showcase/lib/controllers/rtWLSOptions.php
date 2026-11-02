@@ -218,10 +218,10 @@ if ( ! class_exists( 'rtWLSOptions' ) ) :
 			return [
 				'wls_limit'      => [
 					'name'        => 'wls_limit',
-					'label'       => esc_html__( 'Limit', 'wp-logo-showcase' ),
+					'label'       => esc_html__( 'Logo Limit', 'wp-logo-showcase' ),
 					'type'        => 'number',
 					'class'       => 'full',
-					'description' => esc_html__( 'The number of posts to show. Set empty to show all found posts.', 'wp-logo-showcase' ),
+					'description' => esc_html__( 'The number of logos to show. Leave it blank to show all logos.', 'wp-logo-showcase' ),
 				],
 				'wls_categories' => [
 					'name'        => 'wls_categories',
@@ -230,7 +230,7 @@ if ( ! class_exists( 'rtWLSOptions' ) ) :
 					'class'       => 'rt-select2',
 					'id'          => 'wls_categories',
 					'multiple'    => true,
-					'description' => esc_html__( 'Select the category you want to filter, Leave it blank for All category', 'wp-logo-showcase' ),
+					'description' => esc_html__( 'Show logos from these categories only. Leave it blank to show all categories.', 'wp-logo-showcase' ),
 					'options'     => $rtWLS->getAllWlsCategoryList(),
 				],
 				'wls_order_by'   => [
@@ -329,7 +329,7 @@ if ( ! class_exists( 'rtWLSOptions' ) ) :
 					'holderClass' => 'hidden wls_carousel_options_holder',
 					'type'        => 'number',
 					'default'     => 3,
-					'description' => esc_html__( 'Number of logo to to scroll, Recommended > same as  slides to show', 'wp-logo-showcase' ),
+					'description' => esc_html__( 'Number of logos to move on each slide. Recommended: the same as the number of logos shown.', 'wp-logo-showcase' ),
 				],
 				'wls_carousel_speed'           => [
 					'name'        => 'wls_carousel_speed',
@@ -337,7 +337,7 @@ if ( ! class_exists( 'rtWLSOptions' ) ) :
 					'holderClass' => 'hidden wls_carousel_options_holder',
 					'type'        => 'number',
 					'default'     => 2000,
-					'description' => esc_html__( 'Auto play Speed in milliseconds', 'wp-logo-showcase' ),
+					'description' => esc_html__( 'How long the slide animation takes, in milliseconds (1000 = 1 second).', 'wp-logo-showcase' ),
 				],
 				'wls_carousel_options'         => [
 					'name'        => 'wls_carousel_options',
@@ -422,6 +422,44 @@ if ( ! class_exists( 'rtWLSOptions' ) ) :
 			];
 		}
 
+
+		/**
+		 * Description line limit options, shared by the shortcode and Elementor.
+		 * Same keys as the Pro version, so a saved limit survives an upgrade.
+		 *
+		 * @return array
+		 */
+		public function scDescriptionLimits() {
+			return [
+				''  => esc_html__( 'Default', 'wp-logo-showcase' ),
+				'1' => esc_html__( '1 Line', 'wp-logo-showcase' ),
+				'2' => esc_html__( '2 Lines', 'wp-logo-showcase' ),
+				'3' => esc_html__( '3 Lines', 'wp-logo-showcase' ),
+				'4' => esc_html__( '4 Lines', 'wp-logo-showcase' ),
+				'5' => esc_html__( '5 Lines', 'wp-logo-showcase' ),
+			];
+		}
+
+		/**
+		 * Description line limit field, shown under Field Selection
+		 *
+		 * @return array
+		 */
+		public function scDescriptionLimitFields() {
+			return [
+				'wls_description_limit' => [
+					'name'        => 'wls_description_limit',
+					'type'        => 'select',
+					'label'       => esc_html__( 'Content Limit', 'wp-logo-showcase' ),
+					'id'          => 'wls_description_limit',
+					'class'       => 'rt-select2',
+					'holderID'    => 'wls_description_limit_holder',
+					'holderClass' => 'hidden',
+					'description' => esc_html__( 'Default shows the full description.', 'wp-logo-showcase' ),
+					'options'     => $this->scDescriptionLimits(),
+				],
+			];
+		}
 
 		/**
 		 * Carousel Property

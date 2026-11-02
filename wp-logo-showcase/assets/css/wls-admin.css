@@ -451,6 +451,71 @@ input.large-text.code.rt-code-sc {
     background: url('../images/loading.gif') no-repeat center center;
     padding: 11px;
 }
+
+/* ShortCode layout preview */
+.wls-preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.wls-preview-toolbar .spinner {
+    float: none;
+    margin: 0 8px 0 0;
+}
+
+.wls-preview-devices {
+    display: flex;
+}
+
+.wls-preview-devices .wls-preview-device {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 8px;
+    border-radius: 0;
+}
+
+.wls-preview-devices .wls-preview-device + .wls-preview-device {
+    margin-left: -1px;
+}
+
+.wls-preview-devices .wls-preview-device:first-child {
+    border-radius: 3px 0 0 3px;
+}
+
+.wls-preview-devices .wls-preview-device:last-child {
+    border-radius: 0 3px 3px 0;
+}
+
+.wls-preview-devices .wls-preview-device.is-active {
+    position: relative;
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+
+.wls-preview-viewport {
+    position: relative;
+    overflow: hidden;
+    min-height: 150px;
+    transition: opacity .2s ease;
+}
+
+.wls-preview-viewport.is-loading {
+    opacity: .5;
+}
+
+.wls-preview-viewport iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border: 0;
+    transform-origin: 0 0;
+}
 /************************** Others End **************************/
 
 

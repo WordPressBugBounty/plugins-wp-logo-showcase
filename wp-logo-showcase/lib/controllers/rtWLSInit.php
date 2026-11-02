@@ -211,6 +211,13 @@ if ( ! class_exists( 'rtWLSInit' ) ) :
 				'footer' => true,
 			];
 
+			$scripts[] = [
+				'handle' => 'rt-wls-elementor',
+				'src'    => $rtWLS->assetsUrl . 'js/wls-elementor.js',
+				'deps'   => [ 'jquery' ],
+				'footer' => true,
+			];
+
 			$styles['rt-wls'] = $rtWLS->assetsUrl . 'css/wplogoshowcase.css';
 
 			if ( is_admin() ) {

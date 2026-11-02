@@ -149,7 +149,8 @@ if ( ! class_exists( 'rtWLSHelper' ) ) :
 			$fieldsA = array_merge(
 				$rtWLS->scLayoutMetaFields(),
 				$rtWLS->scFilterMetaFields(),
-				$rtWLS->scStyleFields()
+				$rtWLS->scStyleFields(),
+				$rtWLS->scDescriptionLimitFields()
 			);
 
 			foreach ( $fieldsA as $field ) {
@@ -242,6 +243,11 @@ if ( ! class_exists( 'rtWLSHelper' ) ) :
 		}
 
 		public function sanitize_hex_color( $color ) {
+			// Crafted input such as color[]=x arrives as an array; preg_match() would fatal on it.
+			if ( ! is_string( $color ) ) {
+				return null;
+			}
+
 			if ( '' === $color ) {
 				return '';
 			}

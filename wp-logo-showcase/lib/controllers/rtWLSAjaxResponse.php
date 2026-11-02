@@ -57,8 +57,9 @@ if ( ! class_exists( 'rtWLSAjaxResponse' ) ) :
 				$error = true;
 				$msg   = esc_html__( 'Settings successfully updated', 'wp-logo-showcase' );
 			} else {
-
-					$msg = esc_html__( 'Security Error !!', 'wp-logo-showcase' );
+				// wls-admin.js reads a true "error" flag as success: false shows this as an error.
+				$error = false;
+				$msg   = esc_html__( 'Security Error !!', 'wp-logo-showcase' );
 			}
 			wp_send_json(
 				[

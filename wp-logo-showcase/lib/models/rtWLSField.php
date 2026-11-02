@@ -59,17 +59,17 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 				$this->value = ( $v ? $v : $this->default );
 			}
 
-			$this->label       = isset( $attr['label'] ) ? ( $attr['label'] ? $attr['label'] : null ) : null;
-			$this->id          = isset( $attr['id'] ) ? ( $attr['id'] ? $attr['id'] : null ) : null;
-			$this->class       = isset( $attr['class'] ) ? ( $attr['class'] ? $attr['class'] : null ) : null;
-			$this->holderClass = isset( $attr['holderClass'] ) ? ( $attr['holderClass'] ? $attr['holderClass'] : null ) : null;
-			$this->holderID    = isset( $attr['holderID'] ) ? ( $attr['holderID'] ? $attr['holderID'] : null ) : null;
-			$this->placeholder = isset( $attr['placeholder'] ) ? ( $attr['placeholder'] ? $attr['placeholder'] : null ) : null;
-			$this->description = isset( $attr['description'] ) ? ( $attr['description'] ? $attr['description'] : null ) : null;
+			$this->label       = isset( $attr['label'] ) ? ( $attr['label'] ? $attr['label'] : '' ) : '';
+			$this->id          = isset( $attr['id'] ) ? ( $attr['id'] ? $attr['id'] : '' ) : '';
+			$this->class       = isset( $attr['class'] ) ? ( $attr['class'] ? $attr['class'] : '' ) : '';
+			$this->holderClass = isset( $attr['holderClass'] ) ? ( $attr['holderClass'] ? $attr['holderClass'] : '' ) : '';
+			$this->holderID    = isset( $attr['holderID'] ) ? ( $attr['holderID'] ? $attr['holderID'] : '' ) : '';
+			$this->placeholder = isset( $attr['placeholder'] ) ? ( $attr['placeholder'] ? $attr['placeholder'] : '' ) : '';
+			$this->description = isset( $attr['description'] ) ? ( $attr['description'] ? $attr['description'] : '' ) : '';
 			$this->options     = isset( $attr['options'] ) ? ( $attr['options'] ? $attr['options'] : [] ) : [];
-			$this->option      = isset( $attr['option'] ) ? ( $attr['option'] ? $attr['option'] : null ) : null;
+			$this->option      = isset( $attr['option'] ) ? ( $attr['option'] ? $attr['option'] : '' ) : '';
 			$this->attr        = isset( $attr['attr'] ) ? ( $attr['attr'] ? $attr['attr'] : null ) : null;
-			$this->alignment   = isset( $attr['alignment'] ) ? ( $attr['alignment'] ? $attr['alignment'] : null ) : null;
+			$this->alignment   = isset( $attr['alignment'] ) ? ( $attr['alignment'] ? $attr['alignment'] : '' ) : '';
 			$this->blank       = ! empty( $attr['blank'] ) ? $attr['blank'] : null;
 			$this->class       = $this->class ? $this->class . ' rt-form-control' : 'rt-form-control';
 		}
@@ -163,7 +163,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='text'
                     class='" . esc_attr( $this->class ) . "'
                     id='" . esc_attr( $this->id ) . "'
-                    value='" . esc_attr( $this->value ) . "'
+                    value='" . esc_attr( (string) $this->value ) . "'
                     name='" . esc_attr( $this->name ) . "'
                     placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
@@ -182,7 +182,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='text'
                     class='" . esc_attr( $this->class ) . " rt-color'
                     id='" . esc_attr( $this->id ) . "'
-                    value='" . esc_attr( $this->value ) . "'
+                    value='" . esc_attr( (string) $this->value ) . "'
                     name='" . esc_attr( $this->name ) . "'
                     placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
@@ -209,7 +209,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                         class='custom_css_textarea'
                         id='" . esc_attr( $this->id ) . "'
                         name='" . esc_attr( $this->name ) . "'
-                        >" . esc_textarea( $this->value ) . "</textarea>";
+                        >" . esc_textarea( (string) $this->value ) . "</textarea>";
 			$h .= '</div>';
 
 			return $h;
@@ -226,7 +226,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='url'
                     class='" . esc_attr( $this->class ) . "'
                     id='" . esc_attr( $this->id ) . "'
-                    value='" . esc_attr( $this->value ) . "'
+                    value='" . esc_attr( (string) $this->value ) . "'
                     name='" . esc_attr( $this->name ) . "'
                     placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
@@ -245,7 +245,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     type='number'
                     class='" . esc_attr( $this->class ) . "'
                     id='" . esc_attr( $this->id ) . "'
-                    value='" . esc_attr( $this->value ) . "'
+                    value='" . esc_attr( (string) $this->value ) . "'
                     name='" . esc_attr( $this->name ) . "'
                     placeholder='" . esc_attr( $this->placeholder ) . "'
                     />";
@@ -298,7 +298,7 @@ if ( ! class_exists( 'rtWLSField' ) ) :
                     id='" . esc_attr( $this->id ) . "'
                     name='" . esc_attr( $this->name ) . "'
                     placeholder='" . esc_attr( $this->placeholder ) . "'
-                    >" . esc_textarea( $this->value ) . "</textarea>";
+                    >" . esc_textarea( (string) $this->value ) . "</textarea>";
 
 			return $h;
 		}
@@ -361,9 +361,10 @@ if ( ! class_exists( 'rtWLSField' ) ) :
 		 */
 		private function imageSize() {
 			global $rtWLS;
-			$width    = ( ! empty( $this->value['width'] ) ? absint( $this->value['width'] ) : null );
-			$height   = ( ! empty( $this->value['height'] ) ? absint( $this->value['height'] ) : null );
-			$cropV    = ( ! empty( $this->value['crop'] ) ? $this->value['crop'] : false );
+			$size     = is_array( $this->value ) ? $this->value : [];
+			$width    = ( ! empty( $size['width'] ) ? absint( $size['width'] ) : '' );
+			$height   = ( ! empty( $size['height'] ) ? absint( $size['height'] ) : '' );
+			$cropV    = ( ! empty( $size['crop'] ) ? $size['crop'] : false );
 			$h        = null;
 			$h       .= "<div class='rt-image-size-holder d-flex'>";
 			$h       .= "<div class='rt-image-size-width rt-image-size d-flex'>";

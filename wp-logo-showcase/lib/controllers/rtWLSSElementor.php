@@ -20,7 +20,6 @@ if ( ! class_exists( 'rtWLSSElementor' ) ) :
 				add_action( 'elementor/widgets/register', [ $this, 'init' ] );
 			}
 		}
-
 		public function init(  $widgets_manager  ) {
 			global $rtWLS;
 

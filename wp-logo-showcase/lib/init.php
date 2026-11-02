@@ -70,9 +70,11 @@ if ( ! class_exists( 'rtWLS' ) ) {
 						'rtWLSInit',
 						'rtWLSMeta',
 						'rtWLSOptions',
+						'rtWLSPreview',
 						'rtWLSSCButton',
 						'rtWLSSCMeta',
 						'rtWLSSElementor',
+						'rtWLSSElementorInit',
 						'rtWLSSGutenBurg',
 						'rtWLSShortCode',
 					];
@@ -80,6 +82,65 @@ if ( ! class_exists( 'rtWLS' ) ) {
 					return [ 'rtWLSWidget' ];
 			}
 			return [];
+		}
+
+		/**
+		 * Bundled Elementor classes, keyed by their directory relative to lib/.
+		 * Same allowlist guarantee as trustedClassNames() — nothing outside this
+		 * map is ever required from lib/elementor/.
+		 */
+		private function trustedElementorClassNames( $relDir ) {
+			switch ( $relDir ) {
+				case 'elementor':
+					return [ 'rtWLSSElementorControls', 'rtWLSSElementorWidgets' ];
+				case 'elementor/controls':
+					return [ 'rtWLSSImageSelectorControl' ];
+				case 'elementor/elements/sections':
+					return [ 'rtWLSSElementorContentSections', 'rtWLSSElementorStyleSections' ];
+				case 'elementor/elements/tabs':
+					return [
+						'rtWLSSElementorGridContent',
+						'rtWLSSElementorGridStyle',
+						'rtWLSSElementorSliderContent',
+						'rtWLSSElementorSliderStyle',
+					];
+				case 'elementor/elements/renders':
+					return [ 'rtWLSSElementorRender' ];
+				case 'elementor/elements':
+					return [ 'rtWLSSElementorGridWidget', 'rtWLSSElementorSliderWidget' ];
+			}
+			return [];
+		}
+
+		/**
+		 * Load the allowlisted Elementor classes living in one lib/ subdirectory.
+		 *
+		 * @param string $relDir Directory relative to lib/, e.g. 'elementor/elements'.
+		 */
+		public function loadElementorClass( $relDir ) {
+			// Every class in these directories extends or references an
+			// \Elementor\* class, so loading one without Elementor running
+			// is a fatal. Refuse rather than rely on the caller checking.
+			if ( ! did_action( 'elementor/loaded' ) ) {
+				return;
+			}
+
+			$relDir  = trim( (string) $relDir, '/' );
+			$classes = $this->trustedElementorClassNames( $relDir );
+
+			if ( empty( $classes ) ) {
+				return;
+			}
+
+			$dir = $this->libPath . '/' . $relDir . '/';
+
+			if ( ! is_dir( $dir ) ) {
+				return;
+			}
+
+			foreach ( $classes as $className ) {
+				$this->requireTrusted( $dir, $className );
+			}
 		}
 
 		/**

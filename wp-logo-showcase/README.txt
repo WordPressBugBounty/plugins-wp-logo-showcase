@@ -3,8 +3,9 @@ Contributors: techlabpro1, mamunnu
 Donate link:
 Tags: logo slider, logo showcase, carousel, client logo, logo carousel
 Requires at least: 5.6
-Tested up to: 6.9
-Stable tag: 1.5.3
+Tested up to: 7.1
+Requires PHP: 7.4
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -22,8 +23,10 @@ Logo Slider and Showcase is fully Responsive Plugin to display your logos, clien
 * Carousel Slider with multiple features.
 * Custom Logo Re-sizing.
 * Unlimited Shortcode Generator.
+* Live layout preview in the Shortcode Generator.
 * Custom URL
 * Field selection.
+* Description content limit (1–5 lines) for shortcodes and Elementor.
 * RTL Supported.
 * Multi-Language available.
 * Widget Ready.
@@ -124,6 +127,16 @@ If you like The Post Grid Plugin, then consider checking out our other WordPress
 
 
 == Changelog ==
+
+= 2.0.0 ( October 06, 2026) =
+* Updated: Redesigned all layouts.
+* Added: Free version is automatically deactivated when the Pro version is activated, so both can no longer run at the same time.
+* Added: Admin notice informing that the free version has been deactivated in favour of Pro.
+* Fixed: "Constant already defined" errors when the free and Pro versions were active together.
+
+= 1.5.4 ( September 03, 2026) =
+* Updated: Grid and Design Style.
+* Added: Elementor Widget Support.
 
 = 1.5.3 ( May 20, 2026) =
 * Updated: Improvement plugin security.

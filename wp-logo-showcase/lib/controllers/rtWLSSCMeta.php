@@ -92,17 +92,31 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 		public function remove_all_meta_boxes_wls_sc() {
 			global $wp_meta_boxes, $rtWLS;
 
-			$cpt        = $rtWLS->shortCodePT;
-			$scBoxKey   = $cpt . '_sc_settings_meta';
-			$publishBox = isset( $wp_meta_boxes[ $cpt ]['side']['core']['submitdiv'] )
+			$cpt          = $rtWLS->shortCodePT;
+			$scBoxKey     = $cpt . '_sc_settings_meta';
+			$previewKey   = $cpt . '_sc_preview_meta';
+			$publishBox   = isset( $wp_meta_boxes[ $cpt ]['side']['core']['submitdiv'] )
 				? $wp_meta_boxes[ $cpt ]['side']['core']['submitdiv']
 				: null;
-			$scBox      = isset( $wp_meta_boxes[ $cpt ]['normal']['high'][ $scBoxKey ] )
+			$scBox        = isset( $wp_meta_boxes[ $cpt ]['normal']['high'][ $scBoxKey ] )
 				? $wp_meta_boxes[ $cpt ]['normal']['high'][ $scBoxKey ]
 				: null;
-			$docBox     = isset( $wp_meta_boxes[ $cpt ]['side']['low']['rt_plugin_sc_pro_information'] )
+			$scPreviewBox = isset( $wp_meta_boxes[ $cpt ]['normal']['high'][ $previewKey ] )
+				? $wp_meta_boxes[ $cpt ]['normal']['high'][ $previewKey ]
+				: null;
+			$docBox       = isset( $wp_meta_boxes[ $cpt ]['side']['low']['rt_plugin_sc_pro_information'] )
 				? $wp_meta_boxes[ $cpt ]['side']['low']['rt_plugin_sc_pro_information']
 				: null;
+
+			$normalHigh = [];
+
+			if ( $scBox ) {
+				$normalHigh[ $scBoxKey ] = $scBox;
+			}
+
+			if ( $scPreviewBox ) {
+				$normalHigh[ $previewKey ] = $scPreviewBox;
+			}
 
 			$wp_meta_boxes[ $cpt ] = [
 				'side'   => [
@@ -110,7 +124,7 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 					'low'  => $docBox ? [ 'rt_plugin_sc_pro_information' => $docBox ] : [],
 				],
 				'normal' => [
-					'high' => $scBox ? [ $scBoxKey => $scBox ] : [],
+					'high' => $normalHigh,
 				],
 			];
 
@@ -158,9 +172,12 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 				'rt-wls-admin',
 				'wls',
 				[
-					'nonceID' => esc_attr( $rtWLS->nonceId() ),
-					'nonce'   => esc_attr( $nonce ),
-					'ajaxurl' => esc_url( admin_url( 'admin-ajax.php' ) ),
+					'nonceID'      => esc_attr( $rtWLS->nonceId() ),
+					'nonce'        => esc_attr( $nonce ),
+					// Scoped to the preview action only, so it cannot be replayed to save.
+					'previewNonce' => esc_attr( wp_create_nonce( $rtWLS->nonceText( 'sc_preview' ) ) ),
+					'previewUrl'   => esc_url_raw( $rtWLS->previewUrl() ),
+					'ajaxurl'      => esc_url( admin_url( 'admin-ajax.php' ) ),
 				]
 			);
 
@@ -179,6 +196,15 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 			);
 
 			add_meta_box(
+				$rtWLS->shortCodePT . '_sc_preview_meta',
+				esc_html__( 'Layout Preview', 'wp-logo-showcase' ),
+				[ $this, 'wls_sc_preview_selection' ],
+				$rtWLS->shortCodePT,
+				'normal',
+				'high'
+			);
+
+			add_meta_box(
 				'rt_plugin_sc_pro_information',
 				esc_html__( 'Documentation', 'wp-logo-showcase' ),
 				[ $this, 'rt_plugin_sc_pro_information' ],
@@ -188,6 +214,43 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 			);
 		}
 
+
+		/**
+		 * Layout preview section — wls-admin.js posts the settings to the
+		 * front-end preview page (rtWLSPreview) and shows it in the iframe.
+		 */
+		public function wls_sc_preview_selection() {
+			global $rtWLS;
+
+			$devices = [
+				'desktop' => [ 'dashicons-desktop', esc_html__( 'Desktop', 'wp-logo-showcase' ) ],
+				'tablet'  => [ 'dashicons-tablet', esc_html__( 'Tablet', 'wp-logo-showcase' ) ],
+				'mobile'  => [ 'dashicons-smartphone', esc_html__( 'Mobile', 'wp-logo-showcase' ) ],
+			];
+
+			$html  = '<div class="wls-preview-toolbar">';
+			$html .= '<span class="spinner"></span>';
+			$html .= '<div class="wls-preview-devices" role="group" aria-label="' . esc_attr__( 'Preview device', 'wp-logo-showcase' ) . '">';
+
+			foreach ( $devices as $device => $info ) {
+				$active = 'desktop' === $device;
+				$html  .= sprintf(
+					'<button type="button" class="button wls-preview-device%1$s" data-device="%2$s" aria-pressed="%3$s" title="%4$s"><span class="dashicons %5$s"></span><span class="screen-reader-text">%4$s</span></button>',
+					$active ? ' is-active' : '',
+					esc_attr( $device ),
+					$active ? 'true' : 'false',
+					$info[1],
+					esc_attr( $info[0] )
+				);
+			}
+
+			$html .= '</div>';
+			$html .= '</div>';
+			// No allow-top-navigation: theme or plugin frame-busting scripts cannot take over the edit screen.
+			$html .= '<div class="wls-preview-viewport"><iframe id="wls-sc-preview-frame" name="wls-sc-preview-frame" title="' . esc_attr__( 'Layout preview', 'wp-logo-showcase' ) . '" src="about:blank" scrolling="no" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div>';
+
+			$rtWLS->print_html( $html, true );
+		}
 
 		/**
 		 * Meta info function
@@ -236,7 +299,8 @@ if ( ! class_exists( 'rtWLSSCMeta' ) ) :
 
 			$html .= sprintf( '<div id="sc-wls-filter" class="rt-tab-content">%s</div>', $rtWLS->rtFieldGenerator( $rtWLS->scFilterMetaFields(), true ) );
 
-			$html .= sprintf( '<div id="sc-wls-field-selection" class="rt-tab-content">%s</div>', $rtWLS->rtFieldGenerator( $rtWLS->scFieldSelectionMetaFields(), true ) );
+			// The Content Limit field is shown by wls-admin.js only while Description is checked.
+			$html .= sprintf( '<div id="sc-wls-field-selection" class="rt-tab-content">%s</div>', $rtWLS->rtFieldGenerator( array_merge( $rtWLS->scFieldSelectionMetaFields(), $rtWLS->scDescriptionLimitFields() ), true ) );
 
 			$html .= sprintf( '<div id="sc-wls-style" class="rt-tab-content">%s</div>', $rtWLS->rtFieldGenerator( $rtWLS->scStyleFields(), true ) );
 			$html .= '</div>';

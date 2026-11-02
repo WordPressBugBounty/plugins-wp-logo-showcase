@@ -1,0 +1,40 @@
+/* Elementor panel styles for the wls-image-selector control. */
+.elementor-control-image-selector-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.elementor-control-image-selector-wrapper input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.elementor-control-image-selector-wrapper .elementor-image-selector-label {
+    display: block;
+    flex: 0 0 calc(50% - 4px);
+    margin: 0;
+    padding: 3px;
+    border: 2px solid #d5d8dc;
+    border-radius: 3px;
+    cursor: pointer;
+    line-height: 0;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.elementor-control-image-selector-wrapper .elementor-image-selector-label:hover {
+    border-color: #a4afb7;
+}
+
+.elementor-control-image-selector-wrapper input[type="radio"]:checked + .elementor-image-selector-label {
+    border-color: #2271b1;
+}
+
+.elementor-control-image-selector-wrapper .elementor-image-selector-label img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
